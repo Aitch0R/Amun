@@ -5,7 +5,7 @@ import infra.config as config
 logger=importlib.import_module(config.mlogger)
 logger.logger('mainLogger','Amun.log')
 import logging
-mLogger=logging.getLogger('Amun')
+mLogger=logging.getLogger('mainlogger')
 mLogger.info('Starting Amun')
 
 logger.logger('commLogger','comm')
@@ -28,6 +28,6 @@ protocols=importlib.import_module(config.protocols)
 mLogger.info('Importing done')
 
 print (resources.intro)
-#-------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------
 gvar.users.append(user.root())
 protocols.ra()
