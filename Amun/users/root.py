@@ -1,5 +1,7 @@
 configs=dict(name='root', usrid=1,admin=True, port=1000,rooms=[0]) ##################change userid to userID, change 1 to 0, rooms to all
-
+email='h.a.behery@gmail.com'
+Pass='*********'
+to=''
 
 
 
