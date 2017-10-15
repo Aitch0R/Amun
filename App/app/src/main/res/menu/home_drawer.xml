@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <item
+        android:id="@+id/nav_main"
+        android:orderInCategory="0"
+        android:icon="@drawable/ic_menu_camera"
+        android:title="Main" />
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/room_group">
+        <item android:title="Rooms"
+            android:orderInCategory="1"
+            android:id="@+id/rooms">
+            <menu
+                android:id="@+id/rooms_sm">
+                <item
+                    android:id="@+id/nav_blank"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Blank" />
+
+             </menu>
+        </item>
+    </group>
+
+    <item
+        android:title="Tools"
+        android:orderInCategory="2">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Settings" />
+            <item
+                android:id="@+id/nav_advanced"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Advanced" />
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Help" />
+        </menu>
+    </item>
+
+</menu>
