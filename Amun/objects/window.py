@@ -120,7 +120,7 @@ class window(obj):
 			elif value<0:
 				self.blnshlvl=0
 			elif value<0:
-                                self.blnshlvl=25
+				self.blnshlvl=25
 			self.agent.objCmd(self.compose('agent'))		
 		except ValueError:
 			logger.error('Value Error')
@@ -136,21 +136,7 @@ class window(obj):
 		elif cmdid == 0:
 			pass
 		else :
-			logger.warning('nonmatching cmdid')
-		'''try:
-			if typ=='b':
-				if lvl>= 0 or lvl <=100:
-					self.blnislvl=lvl
-				else:
-					raise ValueError
-			elif typ=='d':
-				if lvl>= 0 or lvl <=100:
-					self.winislvl=lvl
-				else:
-					raise ValueError
-		except ValueError:
-			logger.error('Value Error')'''
-		
+			logger.warning('nonmatching cmdid')		
 		self.blnislvl=lvl
 
 	def process (self, _input):

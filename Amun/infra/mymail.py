@@ -12,9 +12,9 @@ logger = logging.getLogger('Osiris')
 logger.debug('OK')
 
 
-usrnm= "h.a.behery@gmail.com"
-psswrd= "1.4x.mah5ih"
-toaddr = "aitch_ramesses@outlook.de"
+usrnm= ###########def in config or users
+psswrd=
+toaddr =
 mail = imaplib.IMAP4_SSL('imap.gmail.com')
 
 def getmail():
