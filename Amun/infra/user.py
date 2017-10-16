@@ -42,7 +42,7 @@ class user(object):
 		#
 		self.rulesupdate()
 		self.server=wcom.server(self,dict(port=self.configs['port']))
-		importlib.import_module(self.filePath).init()
+		types.MethodType(importlib.import_module(self.filePath).init,self)()
 		logger.info(self.logId+'ready')
 		print(self.clientcreate)
 
