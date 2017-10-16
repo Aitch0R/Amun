@@ -132,9 +132,6 @@ class scheduler(object):
 		self.scheduler = BackgroundScheduler()
 		#configure here
 		self.users=[]
-#		for user in users:
-#			users.append(user)
-		self.scheduler.start()
 #		scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
 
 	def addTE(self, userId, _time, cmd, rep=0, delay=3600):
