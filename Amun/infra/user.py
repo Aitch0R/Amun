@@ -42,13 +42,13 @@ class user(object):
 		#
 		self.rulesupdate()
 		self.server=wcom.server(self,dict(port=self.configs['port']))
-		types.MethodType(importlib.import_module(self.filePath).init,self)()
+		self.init=types.MethodType(importlib.import_module(self.filePath).init, self)
+		self.init()
 		logger.info(self.logId+'ready')
 		print(self.clientcreate)
 
 	def rulesupdate(self):#read,compile and excute rules from user file
-		self.rules=importlib.import_module(self.filePath).rule
-		self.rule=types.MethodType(self.rules, self)		
+		self.rule=types.MethodType(importlib.import_module(self.filePath).rule, self)		
 
 	def process(self,caller,_input): ########################################why not use a director?
 		if _input[0]=='s':#setup
