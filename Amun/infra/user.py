@@ -48,11 +48,6 @@ class user(object):
 
 	def rulesupdate(self):#read,compile and excute rules from user file
 		self.rules=importlib.import_module(self.filePath).rule
-#		compiler=compile(self.rules,self.ruleFileName,'exec')
-#		#try:
-#		exec(compiler, globals(), locals())
-#		#except NameError:
-#		#	logger.error(self.logId+'NameError: compile error')
 		self.rule=types.MethodType(self.rules, self)		
 
 	def process(self,caller,_input): ########################################why not use a director?
