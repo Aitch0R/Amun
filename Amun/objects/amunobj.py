@@ -39,3 +39,5 @@ class amunobj(object):
 	def informAll(self):
 		self.parent.informAll(self.compose('client'))
 	
+	def firstContact(self):
+		pass
