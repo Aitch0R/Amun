@@ -39,22 +39,19 @@ def awake(roomsId):
 		room=rooms[id]
 		room.objlists[2][6].power(1)
 		room.objlists[2][0].power(1)
-		room.objlists[2][2].power(1)
 		room.objlists[2][0].status=1
 		room.objlists[2][0].informAttached()
 		time.sleep(6)
 		room.objlists[3][0].standBy(1)
+		room.objlists[4][0].standBy(1)
 
 def asleep(roomsId): ####################fix
 	for id in roomsId:
 		room=rooms[id]
 		room.objlists[2][6].power(1)
-		room.objlists[2][0].power(1)
-		room.objlists[2][0].status=1
 		room.objlists[2][0].informAttached()
 		time.sleep(6)
-		room.objlists[3][0].standBy(1)
-
+		room.objlists[4][0].standBy(0)
 
 def suspend():
 	for obj in rooms[0].objlists[2]:
