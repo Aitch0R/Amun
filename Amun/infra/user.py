@@ -89,7 +89,6 @@ class root(user):
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.rulesupdate()
-		importlib.import_module(self.filePath).init(self,protocols)
 
 	def process(self,_input):
 		self.director.direct(_input,admin)
@@ -111,9 +110,9 @@ class root(user):
 			except KeyboardInterrupt:
 				GPIO.cleanup()
 				print('cleaned up')
-	def test(self, _input):
-		gvar.agents[2].objCmd(_input[0]+',0,'+_input[1])
-		#gvar.agents[2].objCmd('12,c,0,'+_input[0]+','+_input[1])
+	def raOk(self):
+		importlib.import_module(self.filePath).init(self,protocols)
+		
 	def output(self,output): #what the ...?
 		print('test ', output)
 
