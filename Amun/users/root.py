@@ -7,6 +7,7 @@ to=''
 
 def cFunc(self):
 	self.agent.objCmd(self.index+',s,0,500')
+	print(self.index+',s,0,500)
 
 def rule(self,msg):
 	print(msg)
