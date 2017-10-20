@@ -72,13 +72,10 @@ class user(object):
 #--------------------------------------------------------------------------------------------------
 class root(user):
 	def __init__(self):
-		print (globals())
-#		user.__init__(self,'users.root')
-#		global scheduleMngr
 		self.name='root'
 		self.filePath=config.root
 		self.myfile=importlib.import_module(self.filePath)
-		self.protocols=protocols #temp fix (Access point)
+#		self.protocols=protocols #temp fix (Access point)
 		self.ruleFileName=self.name+'Rules'
 		self.admin=True
 		self.director=director(self)
@@ -87,12 +84,12 @@ class root(user):
 		self.server=wcom.server(self,dict(port=1000))
 		self.rules=importlib.import_module(config.rootRules)
 #		terminal port
-		self.runstat=1
+#		self.runstat=1
 #		threading.Thread(target=self.read).start()
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.rulesupdate()
-		importlib.import_module(self.filePath).init(self,globals())
+		importlib.import_module(self.filePath).init(self,protocols)
 
 	def process(self,_input):
 		self.director.direct(_input,admin)
