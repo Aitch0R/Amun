@@ -5,6 +5,9 @@ email='h.a.behery@gmail.com'
 Pass='*********'
 to=''
 
+def cFunc(self):
+	self.agent.objCmd(self.index+',s,0,500')
+
 def rule(self,msg):
 	print(msg)
 	self.input=msg.split(',')
@@ -19,4 +22,6 @@ def init(self,protocols):
 	      protocols.awake([0])
 	self.scheduler.scheduler.add_job(protocols.asleep, trigger='interval', start_date='2017-09-29 00:00:00', args=[self.rooms], days=1)
 	self.scheduler.scheduler.add_job(protocols.awake, trigger='interval', start_date='2017-09-29 6:30:00', args=[self.rooms], days=1)
+	self.rooms.objlists[2].[0].firstcontact=cFunc
 #	self.scheduler.scheduler.add_job(self.scheduler.users[0].output, trigger='interval', start_date='2017-09-29 13:52:05', args=['stuff'], minutes=1)
+
