@@ -24,6 +24,7 @@ class window(obj):
 		self.condition=None
 		self._weight=50
 		self.speed=0
+		self.blnMax=30
 		#-----------------------------------------------------
 		
 	@property
@@ -97,9 +98,9 @@ class window(obj):
 			logger.error('Value Error')
 
 	def blnrellvl(self,change):
-		if change > 0 and self.blnislvl==100:
-			pass #change to eliminate negatie
-		elif change < 0 and self.blnislvl==0:
+		if change > 0 and self.blnislvl+change>self.blnMax: ############bug 
+			pass #change to eliminate negative
+		elif change < 0 and self.blnislvl+change<0:
 			pass
 		else:
 			self.blnshlvl=change*self._weight+self.blnislvl
@@ -115,7 +116,7 @@ class window(obj):
 
 	def blnabslvl(self,value, cmdid):
 		try:
-			if value>= 0 and value <=25:
+			if value>= 0 and value <=30:
 				self.blnshlvl=value
 			elif value<0:
 				self.blnshlvl=0
