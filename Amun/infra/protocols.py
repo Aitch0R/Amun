@@ -32,6 +32,7 @@ def ra():
 	#users
 	for usr in structure.users:
 		users.append(user.user(usr))
+	users[0].raOk()
 
 def awake(roomsId):
 	for id in roomsId:
