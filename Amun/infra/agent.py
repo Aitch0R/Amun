@@ -34,8 +34,8 @@ class agent(object):
 		self.server.send(msg)
 		
 	def firstContact(self):
-		for obj in self.inmap:
-			obj.firstContact()
+		for key in self.inmap:
+			self.inmap[key].firstContact()
 
 	def statusUpdate(self,caller):
 		pass
