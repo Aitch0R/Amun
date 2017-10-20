@@ -72,6 +72,7 @@ class user(object):
 #--------------------------------------------------------------------------------------------------
 class root(user):
 	def __init__(self):
+		print (globals())
 #		user.__init__(self,'users.root')
 #		global scheduleMngr
 		self.name='root'
