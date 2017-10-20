@@ -77,7 +77,7 @@ class root(user):
 		self.name='root'
 		self.filePath=config.root
 		self.myfile=importlib.import_module(self.filePath)
-		self.protocols=protocols=importlib.import_module(config.protocols) #temp fix (Access point)
+		self.protocols=protocols #temp fix (Access point)
 		self.ruleFileName=self.name+'Rules'
 		self.admin=True
 		self.director=director(self)
@@ -91,7 +91,7 @@ class root(user):
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.rulesupdate()
-		importlib.import_module(self.filePath).init(self)
+		importlib.import_module(self.filePath).init(self,globals())
 
 	def process(self,_input):
 		self.director.direct(_input,admin)
