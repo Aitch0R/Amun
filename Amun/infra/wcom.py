@@ -31,6 +31,7 @@ class server(object):
 		while True:
 			self.conn, self.addr = self.s.accept()
 			logger.info(self.logger_id+'connection established')
+			self.parent.firstContact()
 			self.connected=True
 			self.rfile = self.conn.makefile()
 			while True:
