@@ -65,7 +65,7 @@ class light(obj):
 
 	def abslevel(self,value,cmdid):#specific
 		try:
-			if value>= 0 or value <=100:
+			if value>= 0 and value <=100:
 				self.target=value
 				self.cmdid=cmdid
 				self.agent.objCmd(self.compose('agent'))
