@@ -5,10 +5,9 @@ import threading
 import sched
 import time
 import types
-import RPi.GPIO as GPIO
 import infra.config as config
 from pytz import utc
-from apscheduler.schedulers.background import BackgroundScheduler
+from Dependencies.apscheduler.schedulers.background import BackgroundScheduler
 
 wcom=importlib.import_module(config.wcom)
 gvar=importlib.import_module(config.gvar)
@@ -108,7 +107,7 @@ class root(user):
 				#self.test(self._input.split(','))
 				self.director.direct(self._input.split(','),True)
 			except KeyboardInterrupt:
-				GPIO.cleanup()
+				
 				print('cleaned up')
 	def raOk(self):
 		importlib.import_module(self.filePath).init(self,protocols)
