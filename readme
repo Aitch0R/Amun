@@ -1,1 +1,5 @@
 # Amun
+Dependancies:
+	Apscheduler
+	pytz
+	tzlocal
