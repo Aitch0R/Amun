@@ -275,6 +275,9 @@ class brightness_regulator(object):
 
 	def statusUpdate(self,caller):
 		self.inform(caller)
+		
+	def firstContact(self):
+		pass
 
 	def process(self,_input):#try me
 			if _input[0]=='a':
@@ -304,6 +307,9 @@ class temperature_regulator(object):
 		self.temperature_actual=20
 		self.temperature_target=20
 		self.objstring='' #place holder
+		
+	def firstContact(self):
+		pass
 
 	def statusUpdate(self,caller):
 		pass
