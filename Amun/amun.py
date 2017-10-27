@@ -29,5 +29,6 @@ mLogger.info('Importing done')
 print (resources.intro)
 #-------------------------------------------------------------------------------------------------
 user.scheduleMngr=user.scheduler()
+user.scheduleMngr.start()
 gvar.users.append(user.root())
 protocols.ra()
