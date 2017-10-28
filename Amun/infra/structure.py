@@ -1,4 +1,3 @@
-
 #usr1=dict(usrFile='users.aitch')
 other=dict(name='other', usrid=2,admin=False, port=1002,rooms=[0])
 users=[]#'users.aitch']
@@ -7,8 +6,7 @@ esp1=dict(agentId='0', port=151)
 esp2=dict(agentId='1', port=160)
 esp3=dict(agentId='2', port=170)
 agents=[esp1,esp2,esp3]
-#_______________________________________________________________________________________________
-
+#------------------------------------------------------------------------------------------------------
 rooms=1
 
 def roomlis(index):
