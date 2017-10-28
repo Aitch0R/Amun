@@ -12,6 +12,7 @@ window=importlib.import_module(config.window)
 ir=importlib.import_module(config.ir)
 powerS=importlib.import_module(config.powerS)
 irrcv=importlib.import_module(config.irrcv)
+thermostat=importlib.import_module(config.thermostat)
 
 logger = logging.getLogger('mainLogger')
 logger.info('room:OK')
@@ -37,7 +38,8 @@ class room(object):
 		self.powerSs=[]
 		self.regulators=[]
 		self.sensors=[]
-		self.objlists=[self.regulators, self.agents, self.powerSs, self.lights, self.windows, self.irs, self.adbs, self.sensors]
+		self.thermostats=[]
+		self.objlists=[self.regulators, self.agents, self.powerSs, self.lights, self.windows, self.irs, self.adbs, self.sensors, self.thermostats]
 		
 		#communication______________________________________________________________________
 		#self._agents=self.lists['agents']
@@ -88,7 +90,11 @@ class room(object):
 				self._object['preStr']='irrcv'
 				self.preId=7
 				self.objClass=irrcv.ir_rcv
-
+				
+			elif self._object['typ'] == 'thermostat':
+				self._object['preStr']='thrstat'
+				self.preId=8
+				self.objClass=thermostat.thermostat
 #			try:
 			self.objlists[self.preId].append(self.objClass(self,self._object,self.preId,str(len(self.objlists[self.preId]))))
 #			except TypeError:
