@@ -41,3 +41,9 @@ class amunobj(object):
 	
 	def firstContact(self):
 		pass
+	
+	def process(self):
+		pass
+	
+	def aprocess(self):
+		pass
