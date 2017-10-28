@@ -39,8 +39,10 @@ def roomlis(index):
 		ps8= dict(typ='powersupply',name='powersupply8',agent=2,agent_index='16')
 		#sensors
 		ir_rcv= dict(typ='irsensor',name='ir reciever',ps=0)
+		#thermostat
+		thermostat=dict(typ='thermostat',name='heater',ps=3)
 		_agents=[0]
-		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,light3,light4,tv,firestick,ir_rcv]
+		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,light3,light4,tv,firestick,ir_rcv,thermostat]
 		_sensors=[_brightness]
 		room= dict(name='myroom')
 		
