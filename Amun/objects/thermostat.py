@@ -15,8 +15,7 @@ class thermostat(obj):
 	def __init__(self,parent,info,objid):
 		obj.__init__(self,parent,info,objid)
 		#zero------------------------------------------------
-		self.tStatus=0
-		self.aStatus=0
+		self.stat=0
 		self.auto=0
 		#-----------------------------------------------------
 
@@ -29,10 +28,10 @@ class thermostat(obj):
 			msg=self.clientAddr+','+str(self.auto)+','+str(self.aStatus)
 		return msg
 	
-	def setTStat(self,stat):
+	def setStat(self,stat):
 		try:
 			if stat in ['0','1']:
-				self.tStat=stat
+				self.stat=stat
 				self.agent.objCmd(self.compose('agent'))
 		except ValueError:
 			pass
@@ -54,14 +53,8 @@ class thermostat(obj):
 	def process (self, _input):
 		logger.debug(self.name +' process')
 		try:
-			##############################fill here
-			#####################raise error
-
+			self.setAuto(_input[0])
+			self.setState(_input[1])
 			self.informAll()
 		except ValueError: ##################correct error type
 			pass
-
-	def aProcessor(self, _input):
-		#fill here
-		self.setAState
-		self.informAll()
