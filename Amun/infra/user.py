@@ -87,7 +87,12 @@ class root(user):
 #		threading.Thread(target=self.read).start()
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
+		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
+		for room in self.rooms:
+			self.clientcreate=self.clientcreate+self.rooms[str(room)].roomstring
+		
 		self.rulesupdate()
+		
 
 	def process(self,caller,_input):
 		self.director.direct(_input,True)
