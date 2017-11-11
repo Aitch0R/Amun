@@ -230,7 +230,7 @@ class director (object): #that goes into the process method, or?
 		pass
 			
 	def direct(self,_input,admin):
-		print(self._input)
+		print(_input)
 		try:
 			self._input=_input
 			self.len=len(self._input)
