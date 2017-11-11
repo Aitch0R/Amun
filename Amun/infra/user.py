@@ -90,7 +90,7 @@ class root(user):
 		self.rulesupdate()
 
 	def process(self,caller,_input):
-		self.director.direct(_input,admin)
+		self.director.direct(_input,True)
 
 	def manProcess(self,_input):
 		self.input=_input
