@@ -114,7 +114,7 @@ class root(user):
 	def raOk(self):
 		importlib.import_module(self.filePath).init(self,protocols)
 		for room in self.rooms:
-			self.clientcreate=self.clientcreate+rooms.roomstring
+			self.clientcreate=self.clientcreate+room.roomstring
 		
 		
 	def firstContact(self):
