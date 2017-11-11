@@ -12,7 +12,7 @@ logger.info(':thermostat')
 #relevants
 
 class thermostat(obj):
-	def __init__(self,parent,info,objid):
+	def __init__(self,parent,info,preId,objid):
 		obj.__init__(self,parent,info,objid)
 		#zero------------------------------------------------
 		self.stat=0
