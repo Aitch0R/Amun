@@ -89,7 +89,7 @@ class root(user):
 		self.logId=self.name+':'
 		self.rulesupdate()
 
-	def process(self,_input):
+	def process(self,caller,_input):
 		self.director.direct(_input,admin)
 
 	def manProcess(self,_input):
