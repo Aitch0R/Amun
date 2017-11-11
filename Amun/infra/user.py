@@ -112,7 +112,7 @@ class root(user):
 	def raOk(self):
 		importlib.import_module(self.filePath).init(self,protocols)
 		
-	def firstContact():
+	def firstContact(self):
 		pass
 		
 	def output(self,output): #what the ...?
