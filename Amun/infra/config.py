@@ -18,7 +18,7 @@ protocols='infra.protocols'
 gvar='infra.gvar'
 powerS='objects.powerS'
 irrcv='objects.ir_rcv'
-thermostat='objects.thermostat
+thermostat='objects.thermostat'
 #------------------------------------------------
 
 
