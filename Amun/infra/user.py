@@ -113,7 +113,7 @@ class root(user):
 		importlib.import_module(self.filePath).init(self,protocols)
 		
 	def firstContact(self):
-		pass
+		self.server.send(self.clientcreate)
 		
 	def output(self,output): #what the ...?
 		print('test ', output)
