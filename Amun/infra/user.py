@@ -88,9 +88,6 @@ class root(user):
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
-		for room in self.rooms:
-			self.clientcreate=self.clientcreate+self.rooms[str(room)].roomstring
-		
 		self.rulesupdate()
 		
 
@@ -116,6 +113,9 @@ class root(user):
 				print('cleaned up')
 	def raOk(self):
 		importlib.import_module(self.filePath).init(self,protocols)
+		for room in self.rooms:
+			self.clientcreate=self.clientcreate+self.rooms[str(room)].roomstring
+		
 		
 	def firstContact(self):
 		self.server.send(self.clientcreate)
