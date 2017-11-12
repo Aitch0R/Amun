@@ -177,4 +177,6 @@ class ir_rcv(object):
 	def l62(self):										#right window blinds up
 		self.val=self.window1.blnislvl-2
 		self.window1.blnabslvl(self.val,0)	
-
+#----------------------------------------------------------------
+	def inform(self,caller):
+		pass
