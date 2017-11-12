@@ -107,7 +107,6 @@ class root(user):
 #		self.protocols=protocols #temp fix (Access point)
 		self.ruleFileName=self.name+'Rules'
 		self.admin=True
-		self.director=director(self)
 		self.scheduler=scheduleMngr
 		self.scheduler.addUser(self)
 		self.server=wcom.server(self,dict(port=1000))
