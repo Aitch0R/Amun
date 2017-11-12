@@ -127,7 +127,7 @@ class room(object):
 	def statusUpdate(self,caller):
 		for objList in self.objlists:
 			for obj in objList:
-				obj.statusUpdate(caller)
+				obj.inform(caller)
 
 	def shutdown(self, total):#shut all objects?
 		for i in self.agents:
