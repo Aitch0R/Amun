@@ -118,7 +118,6 @@ class room(object):
 		for user in self.users:
 				user.inform(self.nmsg)
 
-	#______________________________________________________________________________
 	def process(self,caller,_input):#try
 		try:
 			self.objlists[int(_input[0])][int(_input[1])].process(_input[2:])
@@ -129,9 +128,7 @@ class room(object):
 		for objList in self.objlists:
 			for obj in objList:
 				obj.statusUpdate(caller)
-		
-		
-		
+
 	def shutdown(self, total):#shut all objects?
 		for i in self.agents:
 			i.shutdown()
