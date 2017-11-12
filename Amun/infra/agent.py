@@ -37,7 +37,7 @@ class agent(object):
 		for key in self.inmap:
 			self.inmap[key].firstContact()
 
-	def statusUpdate(self,caller):
+	def inform(self,caller):
 		pass
 
 	def shutdown(self):
