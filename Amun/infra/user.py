@@ -92,7 +92,7 @@ class user(object):
 		self.nmsg='i,,,'+msg #new message
 		self.server.send(self.nmsg)
 
-	def statusUpdate(self): #################################################why not directly inform?
+	def statusUpdate(self):
 		for room in self.roomsid:
 			self.rooms[str(room)].inform(self)
 
@@ -104,16 +104,12 @@ class root(user):
 		self.name='root'
 		self.filePath=config.root
 		self.myfile=importlib.import_module(self.filePath)
-#		self.protocols=protocols #temp fix (Access point)
 		self.ruleFileName=self.name+'Rules'
 		self.admin=True
 		self.scheduler=scheduleMngr
 		self.scheduler.addUser(self)
 		self.server=wcom.server(self,dict(port=1000))
 		self.rules=importlib.import_module(config.rootRules)
-#		terminal port
-#		self.runstat=1
-#		threading.Thread(target=self.read).start()
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
@@ -124,26 +120,18 @@ class root(user):
 		print('man will do')
 		compiled=compile(self.input,self.ruleFileName,'exec')
 		#exec(compiled)	#suspended till proper try-except
-		
-	#terminal port	
-	def read(self):
-		logger.info('reader starts')
-		while self.runstat == 1:
-			try:
-				self._input=input('>>')
-				#self.test(self._input.split(','))
-				self.director.direct(self._input.split(','),True)
-			except KeyboardInterrupt:
-				
-				print('cleaned up')
+
 	def raOk(self):
 		importlib.import_module(self.filePath).init(self,protocols)
 		for room in self.rooms:
 			self.clientcreate=self.clientcreate+room.roomstring
 		
-		
 	def firstContact(self):
 		self.server.send(self.clientcreate)
+		
+	def statusUpdate(self):
+		for room in self.rooms:
+		self.room.inform(self)
 		
 	def output(self,output): #what the ...?
 		print('test ', output)
