@@ -15,7 +15,8 @@ class thermostat(obj):
 	def __init__(self,parent,info,preId,objid):
 		obj.__init__(self,parent,info,preId,objid)
 		#zero------------------------------------------------
-		self.stat=0
+		self.tState=0
+		self.aState=0
 		self.auto=0
 		#-----------------------------------------------------
 
@@ -23,38 +24,29 @@ class thermostat(obj):
 		if to=='agentS':#setup
 			msg=self.index+',s,'#not needed till now
 		elif to=='agent':#cmd
-			msg=self.index+','+str(self.tStatus)
+			msg=self.index+','+str(self.tState)
 		elif to=='client':
-			msg=self.clientAddr+','+str(self.auto)+','+str(self.aStatus)
+			msg=self.clientAddr+','+str(self.auto)+','+str(self.aState)
 		return msg
 	
-	def setStat(self,stat):
+	def setStat(self, state, typ):
 		try:
 			if stat in ['0','1']:
-				self.stat=stat
-				self.agent.objCmd(self.compose('agent'))
-		except ValueError:
-			pass
-		
-	def setAuto(self, stat):
-		try:
-			if stat in ['0','1']:
-				self.auto=stat
-		except ValueError:
-			pass
-		
-	def setAState(self,stat):
-		try:
-			if stat in ['0','1']:
-				self.aStat=stat
+				if typ=='t':
+					self.tState=state
+					self.agent.objCmd(self.compose('agent'))
+				elif typ=='a':
+					self.aState=state
+				elif typ=='m':
+					self.auto=state
 		except ValueError:
 			pass
 		
 	def process (self, _input):
 		logger.debug(self.name +' process')
 		try:
-			self.setAuto(_input[0])
-			self.setState(_input[1])
+			self.setState(_input[0],'m')
+			self.setState(_input[1],'t')
 			self.informAll()
 		except ValueError: ##################correct error type
 			pass
