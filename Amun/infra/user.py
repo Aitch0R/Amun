@@ -131,7 +131,7 @@ class root(user):
 		
 	def statusUpdate(self):
 		for room in self.rooms:
-		self.room.inform(self)
+			self.room.inform(self)
 		
 	def output(self,output): #what the ...?
 		print('test ', output)
