@@ -118,10 +118,6 @@ class root(user):
 		self.logId=self.name+':'
 		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
 		self.rulesupdate()
-		
-
-	def process(self,caller,_input):
-		self.director.direct(_input,True)
 
 	def manProcess(self,_input):
 		self.input=_input
