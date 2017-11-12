@@ -275,9 +275,6 @@ class brightness_regulator(object):
 	def inform(self,caller):
 		self.msg='0,0,'+str(self.enabled)+','+str(self._brightness_actual)+','+str(self._brightness_target)+','+self.mode
 		caller.inform(self.msg)
-
-	def statusUpdate(self,caller):
-		self.inform(caller)
 		
 	def firstContact(self):
 		pass
