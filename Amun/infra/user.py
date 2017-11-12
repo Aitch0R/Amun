@@ -49,13 +49,43 @@ class user(object):
 	def rulesupdate(self):#read,compile and excute rules from user file
 		self.rule=types.MethodType(importlib.import_module(self.filePath).rule, self)		
 
-	def process(self,caller,_input): ########################################why not use a director?
-		if _input[0]=='s':#setup
-			self.server.send(self.clientcreate)
+	def process(self,_input):
+		print(_input)
+		try:
+			self._input=_input
+			self.len=len(self._input)
+			elif self._input[0]=='i':
+				self.execute(self,self._input[1:])
+			if _input[0]=='se':#setup
+				self.server.send(self.clientcreate)
+			elif _input[0]=='u':#update
+				self.statusUpdate()
+			elif self._input[0]=='sc':
+				if self.len<5:
+					raise IndexError
+				logger.debug(self._input)
+				self.event.new(self,self._input[1:])
+			else:
+				logger.error('unknown command type')
+		except IndexError:
+			logger.error('unknown command format')
+			
+	def execute(self, _input)
+		if self._input[0]=='p':
+			if self._input[1] == 'seth':
+				protocols.shutdown(False)
+			elif self._input[1]=='ra':
+				if not b_ra:
+					ra()
+					self.ra=True
+			else:
+				logger.error('unknown protocol')
 		elif _input[0]=='c':#command
-			self.rooms[_input[1]].process(self,_input[2:])
-		elif _input[0]=='u':#update
-			self.statusUpdate()
+			try:
+				self.parent.rooms[int(self._input[1])].process(2,self._input[2:])
+			except (IndexError,ValueError):
+				logger.error('wrong address')
+
 
 	def inform(self,msg): #inform both user and ruleswatcher
 		self.rule(msg)
@@ -235,39 +265,6 @@ class director (object): #that goes into the process method, or?
 		pass
 			
 	def direct(self,_input,admin):
-		print(_input)
-		try:
-			self._input=_input
-			self.len=len(self._input)
-			if self._input[0]=='p':
-				if self._input[1] == 'seth':
-					protocols.shutdown(False)
-				elif self._input[1]=='ra':
-					if not b_ra:
-						ra()
-						self.ra=True
-				else:
-					logger.error('unknown protocol')
-
-			elif self._input[0]=='c':
-				try:
-					self.parent.rooms[int(self._input[1])].process(2,self._input[2:])
-				except (IndexError,ValueError):
-					logger.error('wrong address')
-
-			elif self._input[0]=='0':
-				if admin:
-					logger.debug(self._input)
-					self.parent.manProcess(inputstr)
-
-			elif self._input[0]=='s':
-				if self.len<5:
-					raise IndexError
-				logger.debug(self._input)
-				self.event.new(self,self._input[1:])
-			else:
-				logger.error('unknown command type')
-		except IndexError:
-			logger.error('unknown command format')
+		
 #-----------------------------------------------------------------
 logger.info('user:OK')
