@@ -49,7 +49,7 @@ class user(object):
 	def rulesupdate(self):#read,compile and excute rules from user file
 		self.rule=types.MethodType(importlib.import_module(self.filePath).rule, self)		
 
-	def process(self,_input):
+	def process(self,caller,_input):
 		print(_input)
 		try:
 			self._input=_input
