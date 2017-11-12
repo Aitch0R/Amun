@@ -311,5 +311,5 @@ class temperature_regulator(object):
 	def firstContact(self):
 		pass
 
-	def statusUpdate(self,caller):
+	def inform(self,caller):
 		pass
