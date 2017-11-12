@@ -258,13 +258,5 @@ class events(object):
 
 	def cancel(self):
 		pass
-#--------------------------------------------------------------------------
-class director (object): #that goes into the process method, or?
-	def __init__(self, parent):		
-		self.parent=parent
-		pass
-			
-	def direct(self,_input,admin):
-		
 #-----------------------------------------------------------------
 logger.info('user:OK')
