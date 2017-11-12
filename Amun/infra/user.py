@@ -54,9 +54,9 @@ class user(object):
 		try:
 			self._input=_input
 			self.len=len(self._input)
-			elif self._input[0]=='i':
+			if self._input[0]=='i':
 				self.execute(self,self._input[1:])
-			if _input[0]=='se':#setup
+			elif _input[0]=='se':#setup
 				self.server.send(self.clientcreate)
 			elif _input[0]=='u':#update
 				self.statusUpdate()
