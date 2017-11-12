@@ -7,7 +7,6 @@ import infra.config as config
 
 wcom=importlib.import_module(config.wcom)
 
-
 logger = logging.getLogger('Osiris')
 logger.info('OK')
 
@@ -92,8 +91,8 @@ class adb(object):
 
 	def dproc(self,msg): #device msg processor
 		print(msg.decode('ascii', errors='ignore'))
-		#print(msg.decode('unicode_escape'))
-	def statusUpdate(self,caller):
+		
+	def inform(self,caller):
 		pass
 
 
