@@ -44,7 +44,7 @@ class ir(obj):
 				print('powercmd')
 			self.transmit(self._input[1])
 
-	def statusUpdate(self,caller):
+	def inform(self,caller): #override
 		pass
 
 	def tvpower(self):
