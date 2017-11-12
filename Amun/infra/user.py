@@ -70,7 +70,7 @@ class user(object):
 		except IndexError:
 			logger.error('unknown command format')
 			
-	def execute(self, _input)
+	def execute(self, _input):
 		if self._input[0]=='p':
 			if self._input[1] == 'seth':
 				protocols.shutdown(False)
