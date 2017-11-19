@@ -22,7 +22,7 @@ class powerS(obj):
 		self.index=str(self.info['agent_index'])
 		self.agent.insert(self,self.index)
 		self.clientAddr=self.preId+','+str(self.objid)
-		self.objstring=',,'+self.preStr+','+str(self.objid)+','+self.name
+		self.objstring='' #keep blank. not needed by app
 		#zero------------------------------------------------
 		self.attached=[]
 		self.auto=1
