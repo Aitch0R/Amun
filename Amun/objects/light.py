@@ -21,7 +21,7 @@ class light(obj):
 		self.stufe=0
 		self.frequency=200
 		self.condition=None
-		#--------------------
+		#------------------------
 
 	def compose(self, to): ###specific
 		if to=='agentS':#status request
@@ -63,7 +63,7 @@ class light(obj):
 			logger.debug('resume')
 			self.condition.release()
 
-	def abslevel(self,value,cmdid):#specific
+	def abslevel(self,value,cmdid=0):#specific
 		try:
 			if value>= 0 and value <=100:
 				self.target=value
@@ -119,79 +119,55 @@ class light(obj):
 		self.feedback(int(_input[0]),int(_input[1]))
 		self.informAll()
 #_____________________________________________________________________________________________________________
-class rgb(light):
-	def __init__(self,parent,info,objid):
-		light.__init__(self,parent,info,objid)
-		self.aRelR=0
-		self.aRelG=0
-		self.aRelB=0
+class rgb(obj):
+	def __init__(self,parent,info,preId,objid):
+		obj.__init__(self,parent,info,preId,objid)
+		self.agents=self.parent.agents
+		self.objlists=[0,0,[self.powerS]]
+		self.R=light(self,dict(name=self.name+'-R',agent=self.info['agent'],agent_index=self.info['agent_index'],preStr='l',ps=0),0,0)
+		self.G=light(self,dict(name=self.name+'-G',agent=self.info['agent'],agent_index=self.info['agent_indexG'],preStr='l',ps=0),0,1)
+		self.B=light(self,dict(name=self.name+'-R',agent=self.info['agent'],agent_index=self.info['agent_indexB'],preStr='l',ps=0),0,2)
 		self.tR=0
 		self.tG=0
 		self.tB=0
-		self.objstring=',,l,2,'+str(self.objid)+','+self.name
 
 	def abscalc(self):
-		self.sum=self.relR+self.relG+self.relB
-		self.tR=int(self.target/self.sum*self.relR)
-		self.tG=int(self.target/self.sum*self.relG)
-		self.tB=int(self.target/self.sum*self.relB)
+		self.R.abslevel(self.tR)
+		self.G.abslevel(self.tG)
+		self.B.abslevel(self.tB)
 
 	def compose(self, to):
 		if to=='agentS':#status request
 			msg='obj,'+self.index+','+str(self.cmdid)+',s'#############fix
 		elif to=='agent':#status request
-			msg='obj,'+self.index+','+str(self.cmdid)+','+str(self.target)+','+str(self.tR)+','+str(self.tG)+','+str(self.tB)
+			msg='obj,'+self.indexR+','+str(self.cmdid)+','+str(self.tR)+','+str(self.tG)+','+str(self.tB)
 		elif to=='client':
 			msg='2,'+str(self.objid)+','+str(self.auto)+','+str(self.actual)+','+str(self.aRelR)+','+str(self.aRelG)+','+str(self.aRelB)
 		return msg
 
 	def feedback(self,cmdid,a,R,G,B):
-		if cmdid == self.cmdid:
-			logger.debug('got'+str(cmdid))
-			self.condition.acquire()
-			self.condition.notify()
-			logger.debug('notify')
-			self.condition.release()
-		elif cmdid == 0:
-			pass
-		else:
-			logger.warning('nonmatching cmdid')
-		try:
-			if 100>= t >=0 and 1000>= R >=0 and 1000>= G >=0 and 1000>= B >=0:
-				self.actual=a
-				self.sum=R+G+B
-				self.aRelR=R/a*self.sum
-				self.aRelG=G/a*self.sum
-				self.aRelB=B/a*self.sum
-			else:
-				raise ValueError
-		except ValueError:
-			logger.error('Value Error')
+		pass
 
 	def process(self, _input):
 		try:
-			if int(_input[0]) in [0,1]:
-				self.auto=int(_input[0])
-			else:
-				pass #####################raise error
-			self._relR=int(_input[2])
-			self._relG=int(_input[3])	
-			self._relB=int(_input[4])
-			if 100>= self._relR >=0 and 100>= self._relG >=0 and 100>= self._relB >=0:
-				self.relR=self._relR
-				self.relG=self._relG
-				self.relB=self._relB
+			self.tR=int(_input[0])
+			self.tG=int(_input[1])	
+			self.tB=int(_input[2])
 			self.abscalc()
-			if 1000>=int(_input[1])>=0:
-				self.abslevel(int(_input[1]),0)
 			self.parent.objlists[0][0].update()
-			self.informAll()
+			self.pInformAll()
 		except ValueError: ################correct error type
 			pass
 	
 	def aProcessor(self, _input):
 		self.feedback(int(_input[1]),int(_input[2]),int(_input[3]),int(_input[4]),int(_input[5]))
 		self.informAll()
+
+	def informAll(self,msg):
+		pass
+
+	def pInformall(self):
+		pass
 #_____________________________________________________________________________________________________________
 
 

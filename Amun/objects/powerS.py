@@ -49,7 +49,7 @@ class powerS(obj):
 			print('auto')
 			for obj in self.attached:
 				print('in obj')
-				if obj._standby==1:
+				if obj._standby=='1':
 					print('sending')
 					self.tStatus=1
 					self.looping=False

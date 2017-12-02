@@ -55,7 +55,7 @@ class user(object):
 			self._input=_input
 			self.len=len(self._input)
 			if self._input[0]=='i':
-				self.execute(self,self._input[1:])
+				self.execute(self._input[1:])
 			elif _input[0]=='se':#setup
 				self.server.send(self.clientcreate)
 			elif _input[0]=='u':#update
@@ -71,18 +71,23 @@ class user(object):
 			logger.error('unknown command format')
 			
 	def execute(self, _input):
-		if self._input[0]=='p':
-			if self._input[1] == 'seth':
+		print(_input[1])
+		if _input[0]=='p':
+			print(_input[1])
+			if _input[1] == 'seth':
 				protocols.shutdown(False)
-			elif self._input[1]=='ra':
-				if not b_ra:
-					ra()
-					self.ra=True
+			elif _input[1]=='awake':
+				protocols.awake([0])
+			elif _input[1]=='asleep':
+				protocols.asleep([0])
+			elif _input[1]=='out':
+				protocols.suspend()
 			else:
 				logger.error('unknown protocol')
 		elif _input[0]=='c':#command
 			try:
-				self.parent.rooms[int(self._input[1])].process(2,self._input[2:])
+				print (_input)
+				self.rooms[int(_input[1])].objlists[int(_input[2])][int(_input[3])].process(_input[4:])
 			except (IndexError,ValueError):
 				logger.error('wrong address')
 

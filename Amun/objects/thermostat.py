@@ -24,29 +24,26 @@ class thermostat(obj):
 		if to=='agentS':#setup
 			msg=self.index+',s,'#not needed till now
 		elif to=='agent':#cmd
-			msg=self.index+','+str(self.tState)
+			msg=self.index+',0,'+str(self.tState)+',60'
 		elif to=='client':
 			msg=self.clientAddr+','+str(self.auto)+','+str(self.aState)
 		return msg
 	
-	def setStat(self, state, typ):
+	def setState(self, state, typ):
 		try:
-			if stat in ['0','1']:
+			if state in ['0','1']:
 				if typ=='t':
 					self.tState=state
 					self.agent.objCmd(self.compose('agent'))
 				elif typ=='a':
 					self.aState=state
-				elif typ=='m':
-					self.auto=state
 		except ValueError:
 			pass
 		
 	def process (self, _input):
 		logger.debug(self.name +' process')
 		try:
-			self.setState(_input[0],'m')
-			self.setState(_input[1],'t')
+			self.setState(_input[0],'t')
 			self.informAll()
 		except ValueError: ##################correct error type
 			pass

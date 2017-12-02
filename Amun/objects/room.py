@@ -55,11 +55,12 @@ class room(object):
 			self.objClass=None
 			
 			if self._object['typ'] == 'light':
-				self._object['preStr']='l'
 				self.preId=3	# index of the list the object will be inserted in
 				if self._object['cls'] == 1:
+					self._object['preStr']='l'
 					self.objClass=light.light
 				elif self._object['cls'] == 2:
+					self._object['preStr']='rgb'
 					self.objClass=light.rgb
 				
 			elif self._object['typ'] == 'window':
@@ -92,7 +93,7 @@ class room(object):
 				self.objClass=irrcv.ir_rcv
 				
 			elif self._object['typ'] == 'thermostat':
-				self._object['preStr']='thrstat'
+				self._object['preStr']='thstt'
 				self.preId=8
 				self.objClass=thermostat.thermostat
 #			try:

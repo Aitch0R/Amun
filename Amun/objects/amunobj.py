@@ -27,7 +27,7 @@ class amunobj(object):
 	
 	def standBy(self, status):
 		print('standby func')
-		if status in [True, False]:
+		if status in ['0', '1']:
 			print('in true')
 			self._standby=status
 			self.powerS.check()
@@ -42,8 +42,8 @@ class amunobj(object):
 	def firstContact(self):
 		pass
 	
-	def process(self):
+	def process(self,_input):
 		pass
 	
-	def aprocess(self):
+	def aProcessor(self,_input):
 		pass

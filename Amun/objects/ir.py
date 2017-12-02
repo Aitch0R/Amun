@@ -36,12 +36,10 @@ class ir(obj):
 
 	def process (self, _input):
 		self._input=_input
-		if self._input[0]=='0':
-			print (self.name)
+		if self._input[0]=='s':
+			self.standBy(self._input[1])
+		else :
 			print(self._input[1])
-			if self._input[1]=='power' and self.name=='tv':
-				self.tvpower()
-				print('powercmd')
 			self.transmit(self._input[1])
 
 	def inform(self,caller): #override

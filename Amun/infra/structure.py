@@ -15,9 +15,7 @@ def roomlis(index):
 		_brightness= dict(typ='brightness', agent=0, c_index=0)
 		#lights----------------
 		light1= dict(typ='light',name='main light', cls=1,agent=0,agent_index='16',ps=3)
-		light2= dict(typ='light',name='RGB Strip', cls=1,agent=0,agent_index='12',ps=3)
-		light3= dict(typ='light',name='RGB Strip', cls=1,agent=0,agent_index='13',ps=3)
-		light4= dict(typ='light',name='RGB Strip', cls=1,agent=0,agent_index='14',ps=3)
+		light2= dict(typ='light',name='RGB Strip', cls=2,agent=0,agent_index='12',agent_indexG='13',agent_indexB='14',ps=3)
 		#windows--------------
 		window1= dict(typ='window',name='right window',agent=1,agent_index='12',ps=4)
 		window2= dict(typ='window',name='left window',agent=1,agent_index='14',ps=4)
@@ -40,7 +38,7 @@ def roomlis(index):
 		#thermostat
 		thermostat=dict(typ='thermostat',name='heater',ps=3, agent=0,agent_index='2')
 		_agents=[0]
-		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,light3,light4,tv,firestick,ir_rcv,thermostat]
+		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,tv,firestick,ir_rcv,thermostat]
 		_sensors=[_brightness]
 		room= dict(name='myroom')
 		

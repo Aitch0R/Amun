@@ -13,7 +13,7 @@ logger.info('OK')
 #dctadb= dict(menu=1 ,home=3, back=4, up=19, down=20, left=21, right=22, center=23, volup=24, voldn=25, power=26, cmr=27, clear=28, space=62, ntr=66, delete=67, search=84, a=29, b=30, c=31, d=32, e=33, f=34, g=35, h=36, i=37, j=38, k=39, l=40, m=41, n=42, o=43, p=44, q=45, r=46, s=47, t=48, u=49, v=50, w=51, x=52, y=53, z=54)
 
 class adb(object):
-	def __init__(self,parent,info,objid,holder):
+	def __init__(self,parent,info,preId,objid):
 		self.info=info
 		self.ip=self.info['ip']
 		self._port=self.info['port']
