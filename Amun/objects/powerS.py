@@ -43,14 +43,10 @@ class powerS(obj):
 		self.attached.append(obj)
 
 	def check(self):
-		print('checking')
 		self.looping=True
 		if self.auto==1:
-			print('auto')
 			for obj in self.attached:
-				print('in obj')
 				if obj._standby=='1':
-					print('sending')
 					self.tStatus=1
 					self.looping=False
 					break

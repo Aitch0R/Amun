@@ -6,7 +6,7 @@ import sched
 import time
 import types
 import infra.config as config
-from pytz import utc
+from pytz import timezone
 from Dependencies.apscheduler.schedulers.background import BackgroundScheduler
 
 wcom=importlib.import_module(config.wcom)
@@ -146,8 +146,8 @@ class root(user):
 #----------------------------------------------------------------------------------------------------
 class scheduler(object):
 	def __init__(self):
-		self.scheduler = BackgroundScheduler()
-		#configure here
+		self.scheduler = BackgroundScheduler(timezone=timezone('Europe/Berlin'))
+		#configure herero
 		self.users=[]
 		self.scheduler.start()
 #		scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
