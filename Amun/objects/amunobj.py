@@ -16,15 +16,18 @@ class amunobj(object):
 		self.objstring=',,'+self.preStr+','+str(self.objid)+','+self.name
 		self.powerS=self.parent.objlists[2][self.info['ps']]
 		self._standby=False
-		self._powered=False
+		self.isPowered=False
 		self.powerS.enlist(self)
+		self.isConnected=False
+		self.isActive=0
 
 	def status(self): #get status from agent by sending setup cmd
 		self.agent.send(self.compose('agentS'))
 
 	def powered(self, status):
 		self._powered=status
-	
+		
+		
 	def standBy(self, status):
 		print('standby func')
 		if status in ['0', '1']:
@@ -39,9 +42,23 @@ class amunobj(object):
 	def informAll(self):
 		self.parent.informAll(self.compose('client'))
 	
-	def firstContact(self):
-		pass
+	def connected(self,state):
+		if state:
+			self.isConnected=1
+		else
+			self.isConnected=0
+		self.parent.informAll(self.compose('client'))
 	
+	def chkActive(self):
+		self.agent.send('test')
+		if isConnected and isPowered:
+			self.temp=1
+		else:
+			self.temp=0
+		if isActive not self.temp
+			self.isActive=self.temp
+			
+
 	def process(self,_input):
 		pass
 	

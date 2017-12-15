@@ -16,6 +16,7 @@ class agent(object):
 		self.logId='agent-'+str(self.port)+': '
 		self.server=wcom.server(self,self.port)
 		self.inmap={}
+		self.isConnected=False
 		self.objstring=''#place holder
 
 	def insert(self,obj,key):
@@ -24,18 +25,16 @@ class agent(object):
 	def process(self,caller,_input):
 		try:
 			self.inmap[_input[0]].aProcessor(_input[1:])
-			'''self.inAdd=self.inmap[_input[0]].split(',')
-			self.cInput=self.inAdd+_input[1:] #corrected input
-			self.parent.process(self.cInput)'''
 		except KeyError:
 			logger.error('unknown dist')
 
 	def objCmd(self, msg):
 		self.server.send(msg)
 		
-	def firstContact(self):
+	def connected(self,state):
+		self.isConnected=state
 		for key in self.inmap:
-			self.inmap[key].firstContact()
+			self.inmap[key].connected(self.isConnected)
 
 	def inform(self,caller):
 		pass

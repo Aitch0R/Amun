@@ -29,9 +29,8 @@ class light(obj):
 		elif to=='agent':#cmd
 			msg=self.index+',c,'+str(self.cmdid)+','+str(self.target)
 		elif to=='client':
-			msg=self.clientAddr+','+str(self.auto)+','+str(self.actual)
+			msg=self.clientAddr+','+str(isConnected)+','+str(self.auto)+','+str(self.actual)
 		return msg
-
 
 	#generate id for the cmd
 	def cmdidgen(self): #specific
@@ -142,7 +141,7 @@ class rgb(obj):
 		elif to=='agent':#status request
 			msg='obj,'+self.indexR+','+str(self.cmdid)+','+str(self.tR)+','+str(self.tG)+','+str(self.tB)
 		elif to=='client':
-			msg='2,'+str(self.objid)+','+str(self.auto)+','+str(self.actual)+','+str(self.aRelR)+','+str(self.aRelG)+','+str(self.aRelB)
+			msg='2,'+str(self.objid)+','+str(self.isConnected)+','+str(self.auto)+','+str(self.actual)+','+str(self.aRelR)+','+str(self.aRelG)+','+str(self.aRelB)
 		return msg
 
 	def feedback(self,cmdid,a,R,G,B):

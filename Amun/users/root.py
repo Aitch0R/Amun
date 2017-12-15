@@ -23,7 +23,7 @@ def init(self,protocols):
 	      protocols.awake([0])
 	self.scheduler.scheduler.add_job(protocols.asleep, trigger='interval', start_date='2017-09-29 10:50:00', args=[[0]], days=1)
 	
-	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 11:02:00', args=['a'], days=1)
+	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 00:47:00', args=['a'], days=1)
 	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 10:02:00', args=['b'], days=1)
 	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 9:02:00', args=['c'], days=1)
 
