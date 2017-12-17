@@ -18,6 +18,9 @@ class powerS(obj):
 		self.preStr=self.info['preStr']
 		self.name=self.info['name']
 		self.objid=objid
+		self.isPowered=False
+		self.isConnected=False
+		self.isActive=False
 		self.agent=self.parent.agents[self.info['agent']]
 		self.index=str(self.info['agent_index'])
 		self.agent.insert(self,self.index)
@@ -73,7 +76,6 @@ class powerS(obj):
 	def aProcessor(self, _input):
 		try:
 			if int(_input[1]) in [0,1]:
-				print('ps got:'+_input[1])
 				self.status=int(_input[1])
 			else:
 				raise ValueError

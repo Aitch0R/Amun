@@ -47,10 +47,8 @@ class window(obj):
 			#gvar.agents[2].objCmd('12,c,0,'+_input[0]+','+_input[1])
 			msg=self.index+',c,'+str(self.cmdid)+','+str(self.blnshlvl)+',25'
 		elif to=='client':
-			msg=self.clientAddr+','+str(self.auto)+','+str(self.blnshlvl)
+			msg=self.clientAddr+','+str(self.isActive)+','+str(self.auto)+','+str(self.blnshlvl)
 		return msg
-
-
 
 	def status(self):
 		self.cmd= 'obj,'+self.index+','+str(self.cmdid)+',s'

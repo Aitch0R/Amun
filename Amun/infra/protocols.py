@@ -32,7 +32,10 @@ def ra():
 	#users
 	for usr in structure.users:
 		users.append(user.user(usr))
+#	threading.Timer(10,users[0].raOk).start()
+	time.sleep(10)
 	users[0].raOk()
+	logger.info('----Amun Ready----')
 
 def awake(roomsId):
 	for id in roomsId:

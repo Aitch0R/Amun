@@ -20,7 +20,7 @@ class adb(object):
 		self.device=self.info['device']
 		self.name=self.info['name']
 #		self.dct=dctadb
-		self.connected=False
+		self.isConnected=False
 		self.objid=objid
 		self.objstring=',,a,'+str(self.objid)+','+self.name
 		self.port=wcom.port(self,dict(ip=self.ip, port=self._port))
@@ -28,7 +28,11 @@ class adb(object):
 
 	def connect(self):
 		self.port.up()
-		self.firstContact()
+
+	def connected(self,state):
+		self.isConnected=state
+		if self.isConnected:
+			self.firstContact()
 
 	def firstContact(self):
 		self.port.send(b'CNXN\x00\x00\x00\x01\x00\x10\x00\x00\x07\x00\x00\x002\x02\x00\x00\xbc\xb1\xa7\xb1host::\x00')

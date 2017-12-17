@@ -59,7 +59,7 @@ class server(object):
 	def connected(self, state):
 		self.isConnected=state
 		self.parent.connected(state)
-		logger.info(self.logger_id+'is connected: '+str(isConnected))
+		logger.info(self.logger_id+'is connected: '+str(self.isConnected))
 	
 	def shutdown(self):
 		self.s.close()
@@ -95,7 +95,7 @@ class port(object):
 			self.thread1.start()
 			self.connected(True)
 		except OSError:
-			self.connecte(=False)
+			self.connected(False)
 
 	def send(self,msg):
 		if not self.isConnected:	
@@ -124,6 +124,7 @@ class port(object):
 	def connected(self, state):
 		self.isConnected=state
 		self.parent.connected(state)
-		logger.info(self.logger_id+'is connected: '+str(isConnected))
+		logger.info(self.logger_id+'is connected: '+str(self.isConnected))
 		if state==False:
-			self.up()
+			pass
+			#self.up()
