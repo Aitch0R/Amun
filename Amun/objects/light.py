@@ -29,9 +29,8 @@ class light(obj):
 		elif to=='agent':#cmd
 			msg=self.index+',c,'+str(self.cmdid)+','+str(self.target)
 		elif to=='client':
-			msg=self.clientAddr+','+str(self.auto)+','+str(self.actual)
+			msg=self.clientAddr+','+str(self.isActive)+','+str(self.auto)+','+str(self.actual)
 		return msg
-
 
 	#generate id for the cmd
 	def cmdidgen(self): #specific
@@ -108,9 +107,8 @@ class light(obj):
 				self.auto=int(_input[0])
 			else:
 				pass #####################raise error
-			self.abslevel(int(int(_input[1])*int(_input[1])),0)
+			self.abslevel(int(_input[1]))
 			self.parent.objlists[0][0].update()############fix to do only when changing mode
-
 			self.informAll()
 		except ValueError: #correct error type
 			pass
@@ -142,7 +140,7 @@ class rgb(obj):
 		elif to=='agent':#status request
 			msg='obj,'+self.indexR+','+str(self.cmdid)+','+str(self.tR)+','+str(self.tG)+','+str(self.tB)
 		elif to=='client':
-			msg='2,'+str(self.objid)+','+str(self.auto)+','+str(self.actual)+','+str(self.aRelR)+','+str(self.aRelG)+','+str(self.aRelB)
+			msg='2,'+str(self.objid)+','+str(self.isActive)+','+str(self.auto)+','+str(self.actual)+','+str(self.aRelR)+','+str(self.aRelG)+','+str(self.aRelB)
 		return msg
 
 	def feedback(self,cmdid,a,R,G,B):

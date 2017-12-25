@@ -13,7 +13,7 @@ class server(object):
 		#self.name=self.info['name']
 		self.ip ='192.168.0.10'
 		self.port=self.info['port']
-		self.connected=False
+		self.isConnected=False
 		self.s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.logger_id='client:'+ str(self.port)+' '
@@ -30,9 +30,7 @@ class server(object):
 		self.s.listen(1)
 		while True:
 			self.conn, self.addr = self.s.accept()
-			logger.info(self.logger_id+'connection established')
-			self.parent.firstContact()
-			self.connected=True
+			self.connected(True)
 			self.rfile = self.conn.makefile()
 			while True:
 				try:
@@ -44,9 +42,8 @@ class server(object):
 					self.tempLog(self.data.split(','))
 					self.incom.start()
 				except ConnectionResetError:
-					break
-					
-			self.connected=False
+					break		
+			self.connected(False)
 			logger.warning(self.logger_id+'connection lost')
 
 	def send(self,msg):
@@ -55,14 +52,16 @@ class server(object):
 			comm.debug('to:'+str(self.port)+' msg:'+msg)
 			self.conn.sendall(self.msg.encode())
 		except AttributeError:
-			logger.debug(self.logger_id+'client not connected')
+			self.connected(False)
 		except BrokenPipeError:
-			logger.debug(self.logger_id+'client not connected')
+			self.connected(False)
 
-
+	def connected(self, state):
+		self.isConnected=state
+		self.parent.connected(state)
+		logger.info(self.logger_id+'is connected: '+str(self.isConnected))
+	
 	def shutdown(self):
-#		if self.connected:
-#			self.s.shutdown(socket.SHUT_RDWR)
 		self.s.close()
 
 	def statusUpdate(self,caller): ###############create class for esp and re write
@@ -82,47 +81,50 @@ class port(object):
 		#self.name=self.info['name']
 		self.ip =self.info['ip']
 		self.port=self.info['port']
-		self.connected=False
+		self.isConnected=False
 		self.s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		self.logger_id='port:'+ str(self.port)+' '
 		logger.info(self.logger_id)
 			
-		
-
 	def up(self): ###############################insert retry if powered at all
 		try:
 			self.s.connect((self.ip,self.port))
 			self.thread1 = threading.Thread(target=self.rcvcom)
 			self.thread1.setDaemon(True)
 			self.thread1.start()
-			self.connected=True
-			self.parent.firstContact()
+			self.connected(True)
 		except OSError:
-			self.connected=False
-			#log an error
+			self.connected(False)
 
 	def send(self,msg):
-		if not self.connected:	
+		if not self.isConnected:	
 			self.up()
 		try:
 			self.s.send(msg)
 		except AttributeError:
 			pass
 		except BrokenPipeError:
-			self.connected=False
+			self.connected(False)
 		except ConnectionResetError:
-			self.connected=False
+			self.connected(False)
 
 	def rcvcom(self):
 		while True:
 			try:
 				self.incom = self.s.recv(4096)
 				if not self.incom:
-					break;
-#				print(self.incom) #print incoming before decoding 
+					break; 
 				self.parent.dproc(self.incom)
 				self.rfile=None		
 			except ConnectionResetError:
 				break	
-			self.connected=False ########try to re connect
+			self.connected(False)
+
+	def connected(self, state):
+		self.isConnected=state
+		self.parent.connected(state)
+		logger.info(self.logger_id+'is connected: '+str(self.isConnected))
+		if state==False:
+			pass
+			#self.up()

@@ -6,8 +6,8 @@ import sched
 import time
 import types
 import infra.config as config
-from pytz import timezone
-from Dependencies.apscheduler.schedulers.background import BackgroundScheduler
+from pytz import timezone as tz
+from apscheduler.schedulers.background import BackgroundScheduler
 
 wcom=importlib.import_module(config.wcom)
 gvar=importlib.import_module(config.gvar)
@@ -95,6 +95,7 @@ class user(object):
 	def inform(self,msg): #inform both user and ruleswatcher
 		self.rule(msg)
 		self.nmsg='i,,,'+msg #new message
+		print(msg)
 		self.server.send(self.nmsg)
 
 	def statusUpdate(self):
@@ -118,8 +119,10 @@ class root(user):
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
+		for room in self.rooms:
+			room.adduser(self)
 		self.rulesupdate()
-
+		
 	def manProcess(self,_input):
 		self.input=_input
 		print('man will do')
@@ -131,8 +134,9 @@ class root(user):
 		for room in self.rooms:
 			self.clientcreate=self.clientcreate+room.roomstring
 		
-	def firstContact(self):
-		self.server.send(self.clientcreate)
+	def connected(self,state):
+		if state:
+			self.server.send(self.clientcreate)
 		
 	def statusUpdate(self):
 		for room in self.rooms:
@@ -146,8 +150,9 @@ class root(user):
 #----------------------------------------------------------------------------------------------------
 class scheduler(object):
 	def __init__(self):
-		self.scheduler = BackgroundScheduler(timezone=timezone('Europe/Berlin'))
-		#configure herero
+		self.scheduler = BackgroundScheduler()
+		#configure here
+		self.scheduler.configure(timezone="Europe/Berlin")
 		self.users=[]
 		self.scheduler.start()
 #		scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
