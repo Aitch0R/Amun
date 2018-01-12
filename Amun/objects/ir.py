@@ -29,10 +29,9 @@ class ir(obj):
 		self.todo=todo
 		try:
 			self.cmd=self.index+self._dict[self.todo]
+			self.agent.objCmd(self.cmd)
 		except KeyError:
 			logger.error(self.todo+' is unknown')	
-		self.agent.objCmd(self.cmd)
-		logger.debug(self.cmd)
 
 	def process (self, _input):
 		self._input=_input
@@ -45,13 +44,6 @@ class ir(obj):
 	def inform(self,caller): #override
 		pass
 
-	def tvpower(self):
-		if self._powered:
-			print('powered')
-			threading.Timer(5,self.standBy, args=(False,)).start()	
-		else:
-			self.standBy(True)
-			print('standing')
 
 	def powered(self, status):
 		self._powered=status

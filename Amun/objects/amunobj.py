@@ -42,7 +42,7 @@ class amunobj(object):
 		caller.inform(str(self.parent.id)+','+self.compose('client'))
 		
 	#inform all users of the current status
-	def informAll(self):
+	def informAll(self,msg='dummy'): #dummy place holder for parent objects 
 		print(self.compose('client'))
 		self.parent.informAll(self.compose('client'))
 	

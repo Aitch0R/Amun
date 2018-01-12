@@ -38,6 +38,7 @@ class adb(object):
 		self.port.send(b'CNXN\x00\x00\x00\x01\x00\x10\x00\x00\x07\x00\x00\x002\x02\x00\x00\xbc\xb1\xa7\xb1host::\x00')
 		
 	def key(self,_input):
+			print('trying to send')
 			try:
 				self.port.send(dictadb[_input]) #fix txt #try except
 			except KeyError:

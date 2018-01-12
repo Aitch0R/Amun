@@ -82,44 +82,57 @@ class port(object):
 		self.ip =self.info['ip']
 		self.port=self.info['port']
 		self.isConnected=False
-		self.s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.s=None
 		self.logger_id='port:'+ str(self.port)+' '
 		logger.info(self.logger_id)
 			
 	def up(self): ###############################insert retry if powered at all
 		try:
+			print('trying to connect')
+			self.s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 			self.s.connect((self.ip,self.port))
 			self.thread1 = threading.Thread(target=self.rcvcom)
 			self.thread1.setDaemon(True)
 			self.thread1.start()
 			self.connected(True)
 		except OSError:
+			print('connect-OSE')
 			self.connected(False)
+			self.shutdown()
+		except ValueError:
+			pass
 
 	def send(self,msg):
+		print('in send')
 		if not self.isConnected:	
 			self.up()
 		try:
 			self.s.send(msg)
 		except AttributeError:
 			pass
+		except OSError:
+			print('send-OSE')
+			self.connected(False)
+			self.shutdown()
 		except BrokenPipeError:
+			print('send-BPE')
 			self.connected(False)
 		except ConnectionResetError:
+			print('send-CRE')
 			self.connected(False)
 
 	def rcvcom(self):
-		while True:
+		while self.isConnected:
 			try:
 				self.incom = self.s.recv(4096)
 				if not self.incom:
 					break; 
 				self.parent.dproc(self.incom)
 				self.rfile=None		
-			except ConnectionResetError:
-				break	
-			self.connected(False)
+			except ConnectionResetError:	
+				self.connected(False)
+				break;
 
 	def connected(self, state):
 		self.isConnected=state
@@ -127,4 +140,11 @@ class port(object):
 		logger.info(self.logger_id+'is connected: '+str(self.isConnected))
 		if state==False:
 			pass
-			#self.up()
+#			self.up()
+
+	def shutdown(self):
+		try:
+			self.s.shutdown(socket.SHUT_RDWR)
+		except OSError:
+			print('in shut-OSE')
+		self.s.close()

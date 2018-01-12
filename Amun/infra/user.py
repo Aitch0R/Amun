@@ -6,7 +6,7 @@ import sched
 import time
 import types
 import infra.config as config
-from pytz import timezone as tz
+from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 
 wcom=importlib.import_module(config.wcom)
@@ -52,19 +52,18 @@ class user(object):
 	def process(self,caller,_input):
 		print(_input)
 		try:
-			self._input=_input
-			self.len=len(self._input)
-			if self._input[0]=='i':
-				self.execute(self._input[1:])
-			elif _input[0]=='se':#setup
+			self.len=len(_input)
+			if _input[0]=='i':
+				self.execute(_input[1:])
+			elif _input[0]=='setup':#setup
 				self.server.send(self.clientcreate)
-			elif _input[0]=='u':#update
+			elif _input[0]=='update':
 				self.statusUpdate()
-			elif self._input[0]=='sc':
+			elif _input[0]=='sc':
 				if self.len<5:
 					raise IndexError
 				logger.debug(self._input)
-				self.event.new(self,self._input[1:])
+				self.event.new(self,_input[1:])
 			else:
 				logger.error('unknown command type')
 		except IndexError:
@@ -119,8 +118,6 @@ class root(user):
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
 		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
-		for room in self.rooms:
-			room.adduser(self)
 		self.rulesupdate()
 		
 	def manProcess(self,_input):
@@ -132,6 +129,7 @@ class root(user):
 	def raOk(self):
 		importlib.import_module(self.filePath).init(self,protocols)
 		for room in self.rooms:
+			room.adduser(self)
 			self.clientcreate=self.clientcreate+room.roomstring
 		
 	def connected(self,state):
@@ -150,9 +148,9 @@ class root(user):
 #----------------------------------------------------------------------------------------------------
 class scheduler(object):
 	def __init__(self):
-		self.scheduler = BackgroundScheduler()
+		self.scheduler = BackgroundScheduler(timezone="Europe/London")
 		#configure here
-		self.scheduler.configure(timezone="Europe/Berlin")
+		#self.scheduler.configure(timezone="Europe/Berlin")
 		self.users=[]
 		self.scheduler.start()
 #		scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
