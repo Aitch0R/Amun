@@ -26,7 +26,7 @@ class thermostat(obj):
 		elif to=='agent':#cmd
 			msg=self.index+',0,'+str(self.tState)+',60'
 		elif to=='client':
-			msg=self.clientAddr+','+str(self.auto)+','+str(self.aState)
+			msg=self.clientAddr+','+str(self.isActive)+','+str(self.auto)+','+str(self.aState)
 		return msg
 	
 	def setState(self, state, typ):

@@ -12,7 +12,7 @@ logger.info('light:OK')
 #---------------------------------------------------------------------
 
 class light(obj):
-	def __init__(self,parent,info,preId,objid):
+	def __init__(self,parent,info,preId,objid,sub=False):
 		obj.__init__(self,parent,info,preId,objid)
 		#zero--------------------
 		self.actual=0
@@ -21,6 +21,7 @@ class light(obj):
 		self.stufe=0
 		self.frequency=200
 		self.condition=None
+		self.sub=sub
 		#------------------------
 
 	def compose(self, to): ###specific
@@ -109,22 +110,35 @@ class light(obj):
 				pass #####################raise error
 			self.abslevel(int(_input[1]))
 			self.parent.objlists[0][0].update()############fix to do only when changing mode
-			self.informAll()
+			if self.sub:
+				self.parent.update()
+			else:
+				self.informAll()
 		except ValueError: #correct error type
 			pass
 
 	def aProcessor(self, _input): #specific #feedback -> cmdid, actual
 		self.feedback(int(_input[0]),int(_input[1]))
-		self.informAll()
+		if self.sub:
+			self.parent.update()
+		else:
+			self.informAll()
 #_____________________________________________________________________________________________________________
 class rgb(obj):
 	def __init__(self,parent,info,preId,objid):
 		obj.__init__(self,parent,info,preId,objid)
 		self.agents=self.parent.agents
 		self.objlists=[0,0,[self.powerS]]
-		self.R=light(self,dict(name=self.name+'-R',agent=self.info['agent'],agent_index=self.info['agent_index'],preStr='l',ps=0),0,0)
-		self.G=light(self,dict(name=self.name+'-G',agent=self.info['agent'],agent_index=self.info['agent_indexG'],preStr='l',ps=0),0,1)
-		self.B=light(self,dict(name=self.name+'-R',agent=self.info['agent'],agent_index=self.info['agent_indexB'],preStr='l',ps=0),0,2)
+		self.R=light(self,dict(name=self.name+'-R',agent=self.info['agent'],agent_index=self.info['agent_index'],preStr='l',ps=0),0,0,sub=True)
+		self.G=light(self,dict(name=self.name+'-G',agent=self.info['agent'],agent_index=self.info['agent_indexG'],preStr='l',ps=0),0,1,sub=True)
+		self.B=light(self,dict(name=self.name+'-R',agent=self.info['agent'],agent_index=self.info['agent_indexB'],preStr='l',ps=0),0,2,sub=True)
+		self.children=[self.R,self.G,self.B]
+		for child in self.children:
+			child.powerS=self.parent.objlists[2][self.info['ps']]
+			child.powerS.enlist(child)
+		self.aR=0
+		self.aG=0
+		self.aB=0
 		self.tR=0
 		self.tG=0
 		self.tB=0
@@ -140,7 +154,7 @@ class rgb(obj):
 		elif to=='agent':#status request
 			msg='obj,'+self.indexR+','+str(self.cmdid)+','+str(self.tR)+','+str(self.tG)+','+str(self.tB)
 		elif to=='client':
-			msg='2,'+str(self.objid)+','+str(self.isActive)+','+str(self.auto)+','+str(self.actual)+','+str(self.aRelR)+','+str(self.aRelG)+','+str(self.aRelB)
+			msg='3,'+str(self.objid)+','+str(self.R.isActive)+','+str(self.aR)+','+str(self.aG)+','+str(self.aB) #using isActive Value from any child light is much easier than having an own value
 		return msg
 
 	def feedback(self,cmdid,a,R,G,B):
@@ -161,10 +175,13 @@ class rgb(obj):
 		self.feedback(int(_input[1]),int(_input[2]),int(_input[3]),int(_input[4]),int(_input[5]))
 		self.informAll()
 
-	def informAll(self,msg):
-		pass
+	def update(self):
+		self.aR=self.R.actual
+		self.aB=self.B.actual
+		self.aG=self.G.actual		
+		self.informAll()
 
-	def pInformall(self):
+	def pInformAll(self):
 		pass
 #_____________________________________________________________________________________________________________
 

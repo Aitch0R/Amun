@@ -280,6 +280,9 @@ class brightness_regulator(object):
 	def firstContact(self):
 		pass
 
+	def connected(self,state):
+		pass
+
 	def process(self,_input):#try me
 			if _input[0]=='a':
 				self.brightness_actual=int(_input[1])

@@ -36,7 +36,7 @@ def roomlis(index):
 		#sensors
 		ir_rcv= dict(typ='irsensor',name='ir reciever',ps=0)
 		#thermostat
-		thermostat=dict(typ='thermostat',name='heater',ps=3, agent=0,agent_index='2')
+		thermostat=dict(typ='thermostat',name='heater',ps=3, agent=0,agent_index='4')
 		_agents=[0]
 		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,tv,firestick,ir_rcv,thermostat]
 		_sensors=[_brightness]
