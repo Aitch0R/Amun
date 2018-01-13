@@ -55,7 +55,7 @@ def asleep(roomsId): ####################fix
 		room.objlists[2][0].informAttached()
 ###             turn heater off
 		time.sleep(6)
-		lists=[4,5,6]
+		lists=[4,5]
 		for id in lists:
 			for obj in room.objlists[id]:
 				obj.standBy('0')

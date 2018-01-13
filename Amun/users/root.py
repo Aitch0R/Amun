@@ -22,13 +22,7 @@ def init(self,protocols):
 #	m=int(time.strftime('%m',time.localtime()))
 	if H>=6:
 	      protocols.awake([0])
-	self.scheduler.scheduler.add_job(protocols.asleep, trigger='interval', start_date='2017-09-29 10:50:00', args=[[0]], days=1)
-	self.ty="Africa/Cairo"
-	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 15:36:00', args=['0'], days=1)
-	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 16:36:00', args=['a'], days=1)
-	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 17:36:00', args=['b'], days=1)
-	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 18:36:00', args=['c'], days=1)
-	self.scheduler.scheduler.add_job(print, trigger='interval', start_date='2017-09-29 19:36:00', args=['1'], days=1)
+	self.scheduler.scheduler.add_job(protocols.asleep, trigger='interval', start_date='2017-09-29 00:00:00', args=[[0]], days=1)
 
 	self.scheduler.scheduler.add_job(protocols.awake, trigger='interval', start_date='2017-09-29 6:30:00', args=[[0]], days=1)
 	self.rooms[0].objlists[2][0].firstcontact=cFunc
