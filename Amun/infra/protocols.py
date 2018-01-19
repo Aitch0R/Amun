@@ -63,8 +63,10 @@ def asleep(roomsId): ####################fix
 def out(roomsId):
 	for id in roomsId:
 		room=rooms[id]
-###             turn heater off
-		time.sleep(6)
+		# turn off all heaters and wait 6 seconds after each
+		for thermostat in room.objlists[8]:
+			thermostat.setState('0','t')
+			time.sleep(6)
 		lists=[3,4,5,6,7]
 		for id in lists:
 			for obj in room.objlists[id]:
