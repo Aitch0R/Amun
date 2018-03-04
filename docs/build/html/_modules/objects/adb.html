@@ -1,0 +1,210 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>objects.adb &#8212; Amun Alpha documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for objects.adb</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">infra.config</span> <span class="k">as</span> <span class="nn">config</span>
+
+<span class="n">wcom</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">wcom</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;Osiris&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;OK&#39;</span><span class="p">)</span>
+
+<span class="c1">#dctadb= dict(menu=1 ,home=3, back=4, up=19, down=20, left=21, right=22, center=23, volup=24, voldn=25, power=26, cmr=27, clear=28, space=62, ntr=66, delete=67, search=84, a=29, b=30, c=31, d=32, e=33, f=34, g=35, h=36, i=37, j=38, k=39, l=40, m=41, n=42, o=43, p=44, q=45, r=46, s=47, t=48, u=49, v=50, w=51, x=52, y=53, z=54)</span>
+
+<div class="viewcode-block" id="adb"><a class="viewcode-back" href="../../objects.html#objects.adb.adb">[docs]</a><span class="k">class</span> <span class="nc">adb</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">preId</span><span class="p">,</span><span class="n">objid</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">=</span><span class="n">info</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;ip&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;device&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+<span class="c1">#		self.dct=dctadb</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">isConnected</span><span class="o">=</span><span class="kc">False</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">objid</span><span class="o">=</span><span class="n">objid</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">objstring</span><span class="o">=</span><span class="s1">&#39;,,a,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objid</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">=</span><span class="n">wcom</span><span class="o">.</span><span class="n">port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">dict</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<div class="viewcode-block" id="adb.connect"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.connect">[docs]</a>	<span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">up</span><span class="p">()</span>
+
+<div class="viewcode-block" id="adb.connected"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.connected">[docs]</a>	<span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">state</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">isConnected</span><span class="o">=</span><span class="n">state</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isConnected</span><span class="p">:</span></div>
+			<span class="bp">self</span><span class="o">.</span><span class="n">firstContact</span><span class="p">()</span>
+
+<div class="viewcode-block" id="adb.firstContact"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.firstContact">[docs]</a>	<span class="k">def</span> <span class="nf">firstContact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;CNXN</span><span class="se">\x00\x00\x00\x01\x00\x10\x00\x00\x07\x00\x00\x00</span><span class="s1">2</span><span class="se">\x02\x00\x00\xbc\xb1\xa7\xb1</span><span class="s1">host::</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+		
+<div class="viewcode-block" id="adb.key"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.key">[docs]</a>	<span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_input</span><span class="p">):</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;trying to send&#39;</span><span class="p">)</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">dictadb</span><span class="p">[</span><span class="n">_input</span><span class="p">])</span> <span class="c1">#fix txt #try except</span>
+			<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span></div>
+				<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">_input</span><span class="o">+</span><span class="s1">&#39; is unknown&#39;</span><span class="p">)</span>	
+			<span class="c1">#self.p = subprocess.Popen(self.msg.split(), stdout=subprocess.PIPE, shell=False)</span>
+	
+<span class="c1">#	def text(self,_input):</span>
+<span class="c1">#		self.txt=_input.split()</span>
+<span class="c1">#		for i in range(0,len(self.txt)):</span>
+<span class="c1">#			self.msg=&quot;adb -s device:&quot;+self.device+&quot; shell input text &quot;+self.txt[i]</span>
+<span class="c1">#			self.p = subprocess.Popen(self.msg.split(), stdout=subprocess.PIPE, shell=False)</span>
+<span class="c1">#			time.sleep(.5)</span>
+<span class="c1">#			if i!=len(self.txt)-1:</span>
+<span class="c1">#				self.msg=&quot;adb -s device:&quot;+self.device+&quot; shell input keyevent 62&quot;</span>
+<span class="c1">#				self.p = subprocess.Popen(self.msg.split(), stdout=subprocess.PIPE, shell=False)</span>
+<span class="c1">#				time.sleep(.3)</span>
+
+<span class="c1">#	def text(self,_input):</span>
+<span class="c1">#		self.txt=_input</span>
+<span class="c1">#		for i in range(0,len(self.txt)):</span>
+<span class="c1">#			if self.txt[i]==&#39; &#39;:</span>
+<span class="c1">#				self.msg=&quot;adb -s device:&quot;+self.device+&quot; shell input keyevent 62&quot;</span>
+<span class="c1">#				self.p = subprocess.Popen(self.msg.split(), stdout=subprocess.PIPE, shell=False)</span>
+<span class="c1">#			else:</span>
+<span class="c1">#				try:</span>
+<span class="c1">#					self.msg=&quot;adb -s device:&quot;+self.device+&quot; shell input keyevent &quot;+str(self.dct[self.txt[i]])</span>
+<span class="c1">#				except KeyError:</span>
+<span class="c1">#					logger.error(self.txt[i]+&#39; is unknown&#39;)				</span>
+<span class="c1">#				self.p = subprocess.Popen(self.msg.split(), stdout=subprocess.PIPE, shell=False)</span>
+<span class="c1">#			time.sleep(0.3)</span>
+
+<span class="c1">#	def check (self):</span>
+<span class="c1">#		self.msg=&quot;adb devices -l&quot;</span>
+<span class="c1">#		logger.info(self.msg)</span>
+<span class="c1">#		self.p = subprocess.Popen(self.msg, stdout=subprocess.PIPE, shell=False)</span>
+<span class="c1">#		(self.output, self.err) = self.p.communicate()</span>
+<span class="c1">#		if self.ip not in self.output.decode():</span>
+<span class="c1">#			self.connected=False</span>
+<span class="c1">#			self.connect()</span>
+			
+<span class="c1">#	def monitor(self):</span>
+<span class="c1">#		self.c=threading.Timer(600,self.monitor)</span>
+<span class="c1">#		self.c.setDaemon(True)</span>
+<span class="c1">#		self.c.start()</span>
+<span class="c1">#		self.connect()</span>
+
+<div class="viewcode-block" id="adb.process"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.process">[docs]</a>	<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_input</span><span class="p">):</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span>
+				<span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">],))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+		<span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span></div>
+			<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;wrong&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="adb.dproc"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.dproc">[docs]</a>	<span class="k">def</span> <span class="nf">dproc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span> <span class="c1">#device msg processor</span></div>
+		<span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">))</span>
+		
+<div class="viewcode-block" id="adb.inform"><a class="viewcode-back" href="../../objects.html#objects.adb.adb.inform">[docs]</a>	<span class="k">def</span> <span class="nf">inform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">caller</span><span class="p">):</span></div></div>
+		<span class="k">pass</span>
+
+
+
+<span class="n">dictadb</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<span class="n">menu</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN9</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x17\x00\x00\x00</span><span class="s1">^</span><span class="se">\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 1</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">home</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN7</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x17\x00\x00\x00</span><span class="s1">`</span><span class="se">\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 3</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">back</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN5</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x17\x00\x00\x00</span><span class="s1">a</span><span class="se">\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 4</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">up</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPENu</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 19</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">down</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN</span><span class="se">\x1b\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x8f\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 20</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">left</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN/</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x90\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 21</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="n">right</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN1</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x91\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 22</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="c1">#center=b&#39;OPENu\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1shell:input keyevent 23\x00&#39;,</span>
+<span class="c1">#volup=b&#39;OPENu\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1shell:input keyevent 24\x00&#39;,</span>
+<span class="c1">#voldn=b&#39;OPENu\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1shell:input keyevent 25\x00&#39;,</span>
+<span class="n">clear</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPENA</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 28</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="c1">#space=b&#39;OPENu\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1shell:input keyevent 62\x00&#39;,</span>
+<span class="n">enter</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;OPEN3</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x99\x08\x00\x00\xb0\xaf\xba\xb1</span><span class="s1">shell:input keyevent 66</span><span class="se">\x00</span><span class="s1">&#39;</span>
+<span class="c1">#delete=b&#39;OPENu\x00\x00\x00\x00\x00\x00\x00\x18\x00\x00\x00\x97\x08\x00\x00\xb0\xaf\xba\xb1shell:input keyevent 67\x00&#39;,</span>
+<span class="p">)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">55 --&gt; &quot;KEYCODE_COMMA&quot; </span>
+<span class="sd">56 --&gt; &quot;KEYCODE_PERIOD&quot; </span>
+<span class="sd">57 --&gt; &quot;KEYCODE_ALT_LEFT&quot; </span>
+<span class="sd">58 --&gt; &quot;KEYCODE_ALT_RIGHT&quot; </span>
+<span class="sd">59 --&gt; &quot;KEYCODE_SHIFT_LEFT&quot; </span>
+<span class="sd">60 --&gt; &quot;KEYCODE_SHIFT_RIGHT&quot; </span>
+<span class="sd">61 --&gt; &quot;KEYCODE_TAB&quot; </span>
+<span class="sd">80 --&gt; &quot;KEYCODE_FOCUS&quot; </span>
+<span class="sd">82 --&gt; &quot;KEYCODE_MENU&quot; </span>
+<span class="sd">83 --&gt; &quot;KEYCODE_NOTIFICATION&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span> 
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Aitch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

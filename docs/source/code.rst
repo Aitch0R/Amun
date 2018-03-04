@@ -1,0 +1,6 @@
+hi
+==
+
+.. automodule:: amun
+   :members:
+
