@@ -17,7 +17,6 @@ import time
 import sys
 
 mLogger.info('Importing modules')
-
 gvar=importlib.import_module(config.gvar)
 gvar.init()
 resources=importlib.import_module(config.resources)
@@ -26,8 +25,16 @@ user=importlib.import_module(config.user)
 protocols=importlib.import_module(config.protocols)
 mLogger.info('Importing done')
 
-print (resources.intro)
+
 #-------------------------------------------------------------------------------------------------
-user.scheduleMngr=user.scheduler()
-gvar.users.append(user.root())
-protocols.ra()
+
+
+def run():
+	'''start Amun'''
+	print (resources.intro)
+	user.scheduleMngr=user.scheduler()
+	gvar.users.append(user.root())
+	protocols.ra()
+
+if __name__=="__main__":
+	run()

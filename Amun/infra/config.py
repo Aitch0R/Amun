@@ -17,7 +17,7 @@ rootRules='users.root'
 protocols='infra.protocols'
 gvar='infra.gvar'
 powerS='objects.powerS'
-irrcv='objects.ir_rcv'
+irrcv='objects.irRcv'
 thermostat='objects.thermostat'
 #------------------------------------------------
 

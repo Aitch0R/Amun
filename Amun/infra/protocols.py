@@ -3,7 +3,7 @@ import importlib
 import logging
 import threading
 import time
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import infra.config as config
 
 gvar=importlib.import_module(config.gvar)
@@ -84,7 +84,7 @@ def shutdown():
 		agent.shutdown()
 	for user in gvar.users:
 		user.shutdown()
-	GPIO.cleanup()
+#	GPIO.cleanup()
 	threading.Timer(1,exit).start()
 #-------------------------------------------------------------------------------------
 logger.info('Protocols:OK')
