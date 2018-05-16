@@ -45,7 +45,10 @@ class amunobj(object):
 	def informAll(self,msg='dummy'): #dummy place holder for parent objects 
 		print(self.compose('client'))
 		self.parent.informAll(self.compose('client'))
-	
+
+	def display(self,msg):
+		self.parent.lcdDisplay(self.name,msg,5)
+
 	def connected(self,state):
 		self.isConnected=state
 		self.chkActive()

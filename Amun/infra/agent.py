@@ -24,7 +24,10 @@ class agent(object):
 
 	def process(self,caller,_input):
 		try:
-			self.inmap[_input[0]].aProcessor(_input[1:])
+			if _input[0]=='0':
+				self.inmap[_input[0]+','+_input[1]].aProcessor(_input[2:])
+			else:
+				self.inmap[_input[0]].aProcessor(_input[1:])
 		except KeyError:
 			logger.error('unknown dist')
 

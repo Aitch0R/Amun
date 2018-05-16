@@ -13,6 +13,7 @@ ir=importlib.import_module(config.ir)
 powerS=importlib.import_module(config.powerS)
 irrcv=importlib.import_module(config.irrcv)
 thermostat=importlib.import_module(config.thermostat)
+lcd=importlib.import_module(config.lcd)
 
 logger = logging.getLogger('mainLogger')
 logger.info('room:OK')
@@ -39,7 +40,8 @@ class room(object):
 		self.regulators=[]
 		self.sensors=[]
 		self.thermostats=[]
-		self.objlists=[self.regulators, self.agents, self.powerSs, self.lights, self.windows, self.irs, self.adbs, self.sensors, self.thermostats]
+		self.lcd=[]
+		self.objlists=[self.regulators, self.agents, self.powerSs, self.lights, self.windows, self.irs, self.sensors, self.adbs, self.thermostats,self.lcd]
 		
 		#communication______________________________________________________________________
 		#self._agents=self.lists['agents']
@@ -77,7 +79,7 @@ class room(object):
 
 			elif self._object['typ'] == 'adb':
 				self._object['preStr']='a'
-				self.preId=6
+				self.preId=7
 				self.objClass=adb
 				#self.objid=str(len(self.adb))
 				#self.adb.append(adb(self,self._object,self.objid))
@@ -86,17 +88,24 @@ class room(object):
 				self._object['preStr']='ps'
 				self.preId=2
 				self.objClass=powerS.powerS
-
-			elif self._object['typ'] == 'irsensor':
-				self._object['preStr']='irrcv'
-				self.preId=7
-				self.objClass=irrcv.ir_rcv
 				
 			elif self._object['typ'] == 'thermostat':
 				self._object['preStr']='thstt'
 				self.preId=8
 				self.objClass=thermostat.thermostat
+
+			elif self._object['typ'] == 'lcd':
+				self._object['preStr']='lcd'
+				self.preId=9
+				self.objClass=lcd.lcd
+
+			elif self._object['typ'] == 'irsensor':
+				self._object['preStr']='irrcv'
+				self.preId=6
+				self.objClass=irrcv.ir_rcv
+
 #			try:
+			print (self._object['typ'])
 			self.objlists[self.preId].append(self.objClass(self,self._object,self.preId,str(len(self.objlists[self.preId]))))
 #			except TypeError:
 #				logger.info('unknown')
@@ -114,10 +123,13 @@ class room(object):
 		self.users.append(user)
 		logger.info(user.name+' added to '+self.name)
 
-	def informAll (self, msg):
+	def informAll(self, msg):
 		self.nmsg=str(self.id)+','+msg
 		for user in self.users:
 				user.inform(self.nmsg)
+
+	def lcdDisplay(self,msg1,msg2,duration):
+		self.lcd[0].display(msg1,msg2,duration)
 
 	def process(self,caller,_input):#try
 		try:

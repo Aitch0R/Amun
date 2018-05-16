@@ -42,6 +42,8 @@ def awake(roomsId):
 		room=rooms[id]
 		room.objlists[2][6].power(1)
 		room.objlists[2][0].power(1)
+		room.objlists[2][3].power(1)
+		room.objlists[2][2].power(1)
 		room.objlists[2][0].status=1
 		room.objlists[2][0].informAttached()
 		time.sleep(2)

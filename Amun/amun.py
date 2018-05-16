@@ -36,5 +36,9 @@ def run():
 	gvar.users.append(user.root())
 	protocols.ra()
 
+def help():
+	'''print help text'''
+	print(resources.help)
+
 if __name__=="__main__":
 	run()

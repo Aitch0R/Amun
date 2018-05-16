@@ -1,17 +1,17 @@
 import logging
 import socket
 import threading
-
+import infra.config as config 
 logger = logging.getLogger('mainLogger')
 comm = logging.getLogger('commLogger')
 
 class server(object):
-	def __init__(self,parent,info):
+	def __init__(self,parent,info,ip=config.localIp):
 		self.parent=parent
 		self.caller=2
 		self.info=info
 		#self.name=self.info['name']
-		self.ip ='192.168.0.10'
+		self.ip =ip
 		self.port=self.info['port']
 		self.isConnected=False
 		self.s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
