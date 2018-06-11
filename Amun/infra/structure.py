@@ -5,7 +5,8 @@ users=[]#'users.aitch']
 esp1=dict(agentId='0', port=151)
 esp2=dict(agentId='1', port=160)
 esp3=dict(agentId='2', port=170)
-agents=[esp1,esp2,esp3]
+esp4=dict(agentId='2', port=152)
+agents=[esp1,esp2,esp3,esp4]
 #------------------------------------------------------------------------------------------------------
 rooms=1
 
@@ -34,11 +35,13 @@ def roomlis(index):
 		ps7= dict(typ='powersupply',name='powersupply7',agent=2,agent_index='14')
 		ps8= dict(typ='powersupply',name='powersupply8',agent=2,agent_index='16')
 		#sensors
-		ir_rcv= dict(typ='irsensor',name='ir reciever',ps=0)
+		ir_rcv= dict(typ='irsensor',name='ir reciever',agent=3,agent_index='0,3',ps=0)
 		#thermostat
 		thermostat=dict(typ='thermostat',name='heater',ps=3, agent=0,agent_index='4')
+		#LCD
+		lcd= dict(typ='lcd',name='LCD',agent=3,agent_index='0,1',ps=7)
 		_agents=[0]
-		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,tv,firestick,ir_rcv,thermostat]
+		_objects = [ps,ps1,ps2,ps3,ps4,ps5,ps6,ps7,ps8,window1,window2,light1,light2,tv,firestick,thermostat,lcd,ir_rcv]
 		_sensors=[_brightness]
 		room= dict(name='myroom')
 		

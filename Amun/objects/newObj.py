@@ -13,7 +13,7 @@ logger.info(':OK') #######################################################change
 
 class newObj(obj):
 	def __init__(self,parent,info,objid):
-		obj.__init__(self,parent,info,objid)
+		obj.__init__(self,parent,info,objId,preId)
 		#zero------------------------------------------------
 		self.tStatus=0
 		self.status=0

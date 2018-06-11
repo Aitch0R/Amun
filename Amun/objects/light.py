@@ -90,6 +90,8 @@ class light(obj):
 			if level>= 0 or level <=100:
 				self.actual=level
 				self.stufe=int(math.sqrt(self.actual))
+				self.display('Brightnes: '+str(self.actual))
+
 			else:
 				raise ValueError
 		except ValueError:
@@ -183,6 +185,9 @@ class rgb(obj):
 
 	def pInformAll(self):
 		pass
+
+	def lcdDisplay(self,a,b,c):
+		self.parent.lcdDisplay(a,b,c)
 #_____________________________________________________________________________________________________________
 
 

@@ -19,6 +19,8 @@ gvar='infra.gvar'
 powerS='objects.powerS'
 irrcv='objects.irRcv'
 thermostat='objects.thermostat'
+lcd='objects.lcd'
 #------------------------------------------------
-
+localIp='192.168.0.10'
+remoteIp='10.242.139.148'
 

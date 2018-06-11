@@ -40,7 +40,8 @@ class user(object):
 		#logger.info(self.logId+self.clientcreate)
 		#
 		self.rulesupdate()
-		self.server=wcom.server(self,dict(port=self.configs['port']))
+		self.serverL=wcom.server(self,dict(port=self.configs['port']))
+		self.serverR=wcom.server(self,dict(port=self.configs['port']),config.remoteIp)
 		self.init=types.MethodType(importlib.import_module(self.filePath).init, self)
 		self.init()
 		logger.info(self.logId+'ready')
@@ -95,7 +96,8 @@ class user(object):
 		self.rule(msg)
 		self.nmsg='i,,,'+msg #new message
 		print(msg)
-		self.server.send(self.nmsg)
+		self.serverL.send(self.nmsg)
+		self.serverR.send(self.nmsg)
 
 	def statusUpdate(self):
 		for room in self.roomsid:
@@ -113,7 +115,8 @@ class root(user):
 		self.admin=True
 		self.scheduler=scheduleMngr
 		self.scheduler.addUser(self)
-		self.server=wcom.server(self,dict(port=1000))
+		self.serverL=wcom.server(self,dict(port=1000))
+		self.serverR=wcom.server(self,dict(port=1000),config.remoteIp)
 		self.rules=importlib.import_module(config.rootRules)
 		self.rooms=gvar.rooms
 		self.logId=self.name+':'
@@ -134,7 +137,8 @@ class root(user):
 		
 	def connected(self,state):
 		if state:
-			self.server.send(self.clientcreate)
+			self.serverL.send(self.clientcreate)
+			self.serverR.send(self.clientcreate)
 		
 	def statusUpdate(self):
 		for room in self.rooms:

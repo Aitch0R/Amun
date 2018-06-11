@@ -24,11 +24,12 @@ class ir_rcv(obj):
 		#String inc: incoming String
 
 		try: #########################combine the signal comparison of the two dicts
-			self.func['_'+btnMap[self.io]]()
-			print(btnMap[self.io])
+			self.func['_'+btnMap['_'+self.io]]()
+			print('io: 'self.io)
+			print(btnMap['_'+self.io])
 		except KeyError:
 			try:
-				self.func=self.mapofmaps['_'+btnMap[self.io]]
+				self.func=self.mapofmaps['_'+btnMap['_'+self.io]]
 				print ('rc mode: '+ self.func['name'])
 			except KeyError:
 #				print ('key not found') #################log as warning?
