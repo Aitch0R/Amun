@@ -34,12 +34,13 @@ class server(object):
             self.conn, self.addr = self.s.accept()
             self.connected(True)
             self.rfile = self.conn.makefile()
+            self.parent.first_contaact()
             while True:
                 try:
                     self.data = self.rfile.readline().strip()
                     if not self.data:
                         break;
-                    #					comm.debug('from:'+str(self.port)+' msg:'+self.data)
+#                   comm.debug('from:'+str(self.port)+' msg:'+self.data)
                     self.incom = threading.Thread(target=self.parent.process, args=(self.caller, self.data.split(','),))
                     self.tempLog(self.data.split(','))
                     self.incom.start()

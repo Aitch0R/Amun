@@ -38,9 +38,9 @@ class user(object):
         self.clientcreate = 's,,,' + str(self.name) + ',' + str(self.admin)
         for room in self.roomsid:
             self.clientcreate = self.clientcreate + self.rooms[str(room)].roomstring
-        # "s,,,1,My room,1,,l,1,main light,,l,2,small light,,a,2,small light";
-        # logger.info(self.logId+self.clientcreate)
-        #
+#           "s,,,1,My room,1,,l,1,main light,,l,2,small light,,a,2,small light";
+#           logger.info(self.logId+self.clientcreate)
+#
         self.rulesupdate()
         self.serverL = wcom.server(self, dict(port=self.configs['port']))
         self.serverR = wcom.server(self, dict(port=self.configs['port']), config.remoteIp)
@@ -164,7 +164,7 @@ class scheduler(object):
         self.users = []
         self.scheduler.start()
 
-    #		scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
+#       scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
 
     def addTE(self, userId, _time, cmd, rep=0, delay=3600):
         self.runDate = time.strftime("%Y-%m-%b", time.localtime()) + ' ' + _time + ':00'
@@ -190,7 +190,7 @@ class events(object):
         self.schedule = sched.scheduler(time.time, time.sleep)
         self.events = [None] * 100
         self.schedule.enterabs(time.time() + 1000, 1, print, 'end')
-        #		threading.Thread(target=self.schedule.run).start()
+#       threading.Thread(target=self.schedule.run).start()
         self.scheduler = BackgroundScheduler()
 
     def newFE(self, function, _time, args=None, rep=0, delay=60):  # default no args, no rep, dealy 1 hour if custom
@@ -250,7 +250,7 @@ class events(object):
         for i in range(100):
             if self.event[i] == None:
                 break
-                return i
+            return i
 
     def timetill(self):
         pass

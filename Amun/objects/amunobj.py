@@ -68,3 +68,6 @@ class amunobj(object):
 
     def aProcessor(self, _input):
         pass
+
+    def first_contact(self):
+        pass
