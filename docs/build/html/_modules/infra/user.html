@@ -1,0 +1,331 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>infra.user &#8212; Amun Alpha documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for infra.user</h1><div class="highlight"><pre>
+<span></span><span class="c1">#import</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">sched</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">infra.config</span> <span class="k">as</span> <span class="nn">config</span>
+<span class="kn">from</span> <span class="nn">pytz</span> <span class="k">import</span> <span class="n">utc</span>
+<span class="kn">from</span> <span class="nn">apscheduler.schedulers.background</span> <span class="k">import</span> <span class="n">BackgroundScheduler</span>
+
+<span class="n">wcom</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">wcom</span><span class="p">)</span>
+<span class="n">gvar</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">gvar</span><span class="p">)</span>
+<span class="n">protocols</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">protocols</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;mainLogger&#39;</span><span class="p">)</span>
+<span class="c1">#---------------------------------------------------------------------</span>
+<div class="viewcode-block" id="user"><a class="viewcode-back" href="../../infra.html#infra.user.user">[docs]</a><span class="k">class</span> <span class="nc">user</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> 
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="p">):</span>
+		<span class="c1">#user</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="o">=</span><span class="n">path</span>	<span class="c1">#user file as spcified in the structure file</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">myfile</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">myfile</span><span class="o">.</span><span class="n">configs</span>	<span class="c1">#read the configs dict</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logId</span><span class="o">=</span><span class="s1">&#39;user-&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;: &#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">admin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">[</span><span class="s1">&#39;admin&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ruleFileName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;Rules&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">=</span><span class="n">events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c1">#create events list</span>
+		<span class="c1">#</span>
+		<span class="c1">#rooms setup</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">roomlist</span><span class="o">=</span><span class="n">gvar</span><span class="o">.</span><span class="n">rooms</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">roomsid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">[</span><span class="s1">&#39;rooms&#39;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">=</span><span class="p">{}</span>
+		<span class="k">for</span> <span class="n">roomid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roomsid</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">roomid</span><span class="p">)]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">roomlist</span><span class="p">[</span><span class="n">roomid</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">roomlist</span><span class="p">[</span><span class="n">roomid</span><span class="p">]</span><span class="o">.</span><span class="n">adduser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c1">#add user to the room object</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="o">=</span><span class="s1">&#39;s,,,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">admin</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roomsid</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">room</span><span class="p">)]</span><span class="o">.</span><span class="n">roomstring</span>
+		<span class="c1">#&quot;s,,,1,My room,1,,l,1,main light,,l,2,small light,,a,2,small light&quot;;</span>
+		<span class="c1">#logger.info(self.logId+self.clientcreate)</span>
+		<span class="c1">#</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rulesupdate</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">=</span><span class="n">wcom</span><span class="o">.</span><span class="n">server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">dict</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">)</span><span class="o">.</span><span class="n">init</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+		<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logId</span><span class="o">+</span><span class="s1">&#39;ready&#39;</span><span class="p">)</span>
+		<span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="p">)</span>
+
+<div class="viewcode-block" id="user.rulesupdate"><a class="viewcode-back" href="../../infra.html#infra.user.user.rulesupdate">[docs]</a>	<span class="k">def</span> <span class="nf">rulesupdate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="c1">#read,compile and excute rules from user file</span></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rule</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">)</span><span class="o">.</span><span class="n">rule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>		
+
+<div class="viewcode-block" id="user.process"><a class="viewcode-back" href="../../infra.html#infra.user.user.process">[docs]</a>	<span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">caller</span><span class="p">,</span><span class="n">_input</span><span class="p">):</span>
+		<span class="nb">print</span><span class="p">(</span><span class="n">_input</span><span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">len</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">_input</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;i&#39;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;setup&#39;</span><span class="p">:</span><span class="c1">#setup</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;update&#39;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">statusUpdate</span><span class="p">()</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;sc&#39;</span><span class="p">:</span>
+				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">len</span><span class="o">&lt;</span><span class="mi">5</span><span class="p">:</span>
+					<span class="k">raise</span> <span class="ne">IndexError</span>
+				<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;unknown command type&#39;</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span></div>
+			<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;unknown command format&#39;</span><span class="p">)</span>
+			
+<div class="viewcode-block" id="user.execute"><a class="viewcode-back" href="../../infra.html#infra.user.user.execute">[docs]</a>	<span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_input</span><span class="p">):</span>
+		<span class="nb">print</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+		<span class="k">if</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;p&#39;</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+			<span class="k">if</span> <span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;seth&#39;</span><span class="p">:</span>
+				<span class="n">protocols</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;awake&#39;</span><span class="p">:</span>
+				<span class="n">protocols</span><span class="o">.</span><span class="n">awake</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;asleep&#39;</span><span class="p">:</span>
+				<span class="n">protocols</span><span class="o">.</span><span class="n">asleep</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+			<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;out&#39;</span><span class="p">:</span>
+				<span class="n">protocols</span><span class="o">.</span><span class="n">suspend</span><span class="p">()</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;unknown protocol&#39;</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;c&#39;</span><span class="p">:</span><span class="c1">#command</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="nb">print</span> <span class="p">(</span><span class="n">_input</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span><span class="o">.</span><span class="n">objlists</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">2</span><span class="p">])][</span><span class="nb">int</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">3</span><span class="p">])]</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">_input</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+			<span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span><span class="ne">ValueError</span><span class="p">):</span></div>
+				<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;wrong address&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="user.inform"><a class="viewcode-back" href="../../infra.html#infra.user.user.inform">[docs]</a>	<span class="k">def</span> <span class="nf">inform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span> <span class="c1">#inform both user and ruleswatcher</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">nmsg</span><span class="o">=</span><span class="s1">&#39;i,,,&#39;</span><span class="o">+</span><span class="n">msg</span> <span class="c1">#new message</span>
+		<span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmsg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="user.statusUpdate"><a class="viewcode-back" href="../../infra.html#infra.user.user.statusUpdate">[docs]</a>	<span class="k">def</span> <span class="nf">statusUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roomsid</span><span class="p">:</span></div>
+			<span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">room</span><span class="p">)]</span><span class="o">.</span><span class="n">inform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="user.shutdown"><a class="viewcode-back" href="../../infra.html#infra.user.user.shutdown">[docs]</a>	<span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div></div>
+		<span class="k">pass</span>
+<span class="c1">#--------------------------------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="root"><a class="viewcode-back" href="../../infra.html#infra.user.root">[docs]</a><span class="k">class</span> <span class="nc">root</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;root&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">root</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">myfile</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ruleFileName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;Rules&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">admin</span><span class="o">=</span><span class="kc">True</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span><span class="o">=</span><span class="n">scheduleMngr</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span><span class="o">.</span><span class="n">addUser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">=</span><span class="n">wcom</span><span class="o">.</span><span class="n">server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">dict</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rules</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">rootRules</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="o">=</span><span class="n">gvar</span><span class="o">.</span><span class="n">rooms</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">logId</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;:&#39;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="o">=</span><span class="s1">&#39;s,,,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">admin</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rulesupdate</span><span class="p">()</span>
+		
+<div class="viewcode-block" id="root.manProcess"><a class="viewcode-back" href="../../infra.html#infra.user.root.manProcess">[docs]</a>	<span class="k">def</span> <span class="nf">manProcess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">_input</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">=</span><span class="n">_input</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;man will do&#39;</span><span class="p">)</span></div>
+		<span class="n">compiled</span><span class="o">=</span><span class="nb">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ruleFileName</span><span class="p">,</span><span class="s1">&#39;exec&#39;</span><span class="p">)</span>
+		<span class="c1">#exec(compiled)	#suspended till proper try-except</span>
+
+<div class="viewcode-block" id="root.raOk"><a class="viewcode-back" href="../../infra.html#infra.user.root.raOk">[docs]</a>	<span class="k">def</span> <span class="nf">raOk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">)</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">protocols</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">:</span>
+			<span class="n">room</span><span class="o">.</span><span class="n">adduser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+			<span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="o">+</span><span class="n">room</span><span class="o">.</span><span class="n">roomstring</span>
+		
+<div class="viewcode-block" id="root.connected"><a class="viewcode-back" href="../../infra.html#infra.user.root.connected">[docs]</a>	<span class="k">def</span> <span class="nf">connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">state</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">state</span><span class="p">:</span></div>
+			<span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clientcreate</span><span class="p">)</span>
+		
+<div class="viewcode-block" id="root.statusUpdate"><a class="viewcode-back" href="../../infra.html#infra.user.root.statusUpdate">[docs]</a>	<span class="k">def</span> <span class="nf">statusUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">room</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rooms</span><span class="p">:</span></div>
+			<span class="n">room</span><span class="o">.</span><span class="n">statusUpdate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		
+<div class="viewcode-block" id="root.output"><a class="viewcode-back" href="../../infra.html#infra.user.root.output">[docs]</a>	<span class="k">def</span> <span class="nf">output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">output</span><span class="p">):</span> <span class="c1">#what the ...?</span></div>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;test &#39;</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+
+<div class="viewcode-block" id="root.shutdown"><a class="viewcode-back" href="../../infra.html#infra.user.root.shutdown">[docs]</a>	<span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">#exit flag</span></div></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">runstat</span><span class="o">=</span><span class="mi">0</span>
+<span class="c1">#----------------------------------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="scheduler"><a class="viewcode-back" href="../../infra.html#infra.user.scheduler">[docs]</a><span class="k">class</span> <span class="nc">scheduler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">BackgroundScheduler</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;Europe/London&quot;</span><span class="p">)</span>
+		<span class="c1">#configure here</span>
+		<span class="c1">#self.scheduler.configure(timezone=&quot;Europe/Berlin&quot;)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="o">=</span><span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="c1">#		scheduler.add_job(print, trigger=&#39;date&#39;, run_date=&#39;2017-09-29 13:52:05&#39;, args=[&#39;stuff&#39;])</span>
+
+<div class="viewcode-block" id="scheduler.addTE"><a class="viewcode-back" href="../../infra.html#infra.user.scheduler.addTE">[docs]</a>	<span class="k">def</span> <span class="nf">addTE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">userId</span><span class="p">,</span> <span class="n">_time</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">rep</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">3600</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">runDate</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-%b&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">_time</span><span class="o">+</span><span class="s1">&#39;:00&#39;</span>
+		<span class="k">if</span> <span class="n">rep</span><span class="o">==</span><span class="s1">&#39;0&#39;</span><span class="p">:</span>
+			<span class="n">scheduler</span><span class="o">.</span><span class="n">add_job</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">userId</span><span class="p">]</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">run_date</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runDate</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">cmd</span><span class="p">])</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">rep</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="c1">#day</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+			<span class="k">elif</span> <span class="n">rep</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="c1">#hour</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+			<span class="k">elif</span> <span class="n">rep</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span> <span class="c1">#custom</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="o">*</span><span class="mi">60</span> <span class="c1">#delay in minutes</span></div>
+			<span class="n">scheduler</span><span class="o">.</span><span class="n">add_job</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">userId</span><span class="p">]</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">trigger</span><span class="o">=</span><span class="s1">&#39;interval&#39;</span><span class="p">,</span> <span class="n">run_date</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runDate</span><span class="p">,</span> <span class="n">minutes</span><span class="o">=</span><span class="n">delay</span> <span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">cmd</span><span class="p">])</span>
+
+<div class="viewcode-block" id="scheduler.addUser"><a class="viewcode-back" href="../../infra.html#infra.user.scheduler.addUser">[docs]</a>	<span class="k">def</span> <span class="nf">addUser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span></div></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+<div class="viewcode-block" id="events"><a class="viewcode-back" href="../../infra.html#infra.user.events">[docs]</a><span class="k">class</span> <span class="nc">events</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> 
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">=</span><span class="n">parent</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">=</span><span class="n">sched</span><span class="o">.</span><span class="n">scheduler</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">+</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="nb">print</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">)</span>
+<span class="c1">#		threading.Thread(target=self.schedule.run).start()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scheduler</span> <span class="o">=</span> <span class="n">BackgroundScheduler</span><span class="p">()</span>
+
+<div class="viewcode-block" id="events.newFE"><a class="viewcode-back" href="../../infra.html#infra.user.events.newFE">[docs]</a>	<span class="k">def</span> <span class="nf">newFE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">_time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rep</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span> <span class="c1">#default no args, no rep, dealy 1 hour if custom</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">timeInSec</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> %b %Y&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="n">_time</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> %b %Y %H:%M&#39;</span><span class="p">))</span> <span class="c1">#time as string in HH:mm format</span>
+			<span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeInSec</span><span class="p">,</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeInSec</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">():</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">enterabs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeInSec</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">rep</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="c1">#day</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+			<span class="k">elif</span> <span class="n">rep</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="c1">#hour</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+			<span class="k">elif</span> <span class="n">rep</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span> <span class="c1">#custom</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="o">=</span><span class="n">delay</span><span class="o">*</span><span class="mi">60</span> <span class="c1">#delay in minutes</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">timeInSec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeInSec</span><span class="o">+</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">rep</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">newFE</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">_time</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">delay</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span></div>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;er&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="events.newTE"><a class="viewcode-back" href="../../infra.html#infra.user.events.newTE">[docs]</a>	<span class="k">def</span> <span class="nf">newTE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">_time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rep</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_input</span><span class="o">=</span><span class="n">_input</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">typ</span><span class="o">=</span><span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_time</span><span class="o">=</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="n">chkfree</span><span class="p">()</span>
+		<span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>		
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">typ</span><span class="o">==</span><span class="s1">&#39;1&#39;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">tofloat</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s2">&quot;%y:%m:</span><span class="si">%d</span><span class="s2">:%H:%M:%S&quot;</span><span class="p">))</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">after</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tofloat</span><span class="o">-</span><span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span>
+			<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">typ</span><span class="o">==</span><span class="s1">&#39;2&#39;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">after</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>				
+			<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;wrong time format&#39;</span><span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">after</span><span class="o">&lt;=</span><span class="mi">0</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ev</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">after</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ev</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ev</span>
+		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+			<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;wrong schedule value&#39;</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span></div>
+			<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;wrong schedule type&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="events.index"><a class="viewcode-back" href="../../infra.html#infra.user.events.index">[docs]</a>	<span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
+	
+<div class="viewcode-block" id="events.execute"><a class="viewcode-back" href="../../infra.html#infra.user.events.execute">[docs]</a>	<span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">director</span><span class="o">.</span><span class="n">direct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span></div>
+		<span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<div class="viewcode-block" id="events.chkfree"><a class="viewcode-back" href="../../infra.html#infra.user.events.chkfree">[docs]</a>	<span class="k">def</span> <span class="nf">chkfree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+				<span class="k">break</span></div>
+				<span class="k">return</span> <span class="n">i</span>
+
+<div class="viewcode-block" id="events.timetill"><a class="viewcode-back" href="../../infra.html#infra.user.events.timetill">[docs]</a>	<span class="k">def</span> <span class="nf">timetill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+		<span class="k">pass</span>
+
+<div class="viewcode-block" id="events.when"><a class="viewcode-back" href="../../infra.html#infra.user.events.when">[docs]</a>	<span class="k">def</span> <span class="nf">when</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+		<span class="k">pass</span>
+
+	<span class="k">def</span> <span class="nf">_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">pass</span>
+
+<div class="viewcode-block" id="events.cancel"><a class="viewcode-back" href="../../infra.html#infra.user.events.cancel">[docs]</a>	<span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div></div>
+		<span class="k">pass</span>
+<span class="c1">#-----------------------------------------------------------------</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;user:OK&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Aitch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

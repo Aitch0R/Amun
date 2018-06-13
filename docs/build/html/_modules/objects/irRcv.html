@@ -1,0 +1,140 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>objects.irRcv &#8212; Amun Alpha documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for objects.irRcv</h1><div class="highlight"><pre>
+<span></span><span class="c1">#import</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">infra.config</span> <span class="k">as</span> <span class="nn">config</span>
+
+<span class="n">obj</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">amunobj</span>
+<span class="n">gvar</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">gvar</span><span class="p">)</span>
+<span class="n">protocols</span><span class="o">=</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">protocols</span><span class="p">)</span>
+
+<span class="n">btnMap</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_00000000111111110011101011000101</span><span class="o">=</span><span class="s1">&#39;11&#39;</span><span class="p">,</span> <span class="n">_00000000111111111011101001000101</span><span class="o">=</span><span class="s1">&#39;12&#39;</span><span class="p">,</span> <span class="n">_00000000111111111000001001111101</span><span class="o">=</span><span class="s1">&#39;13&#39;</span><span class="p">,</span> <span class="n">_00000000111111110000001011111101</span><span class="o">=</span><span class="s1">&#39;14&#39;</span><span class="p">,</span> <span class="n">_00000000111111110001101011100101</span><span class="o">=</span><span class="s1">&#39;21&#39;</span><span class="p">,</span> <span class="n">_00000000111111111001101001100101</span><span class="o">=</span><span class="s1">&#39;22&#39;</span><span class="p">,</span> <span class="n">_00000000111111111010001001011101</span><span class="o">=</span><span class="s1">&#39;23&#39;</span><span class="p">,</span> <span class="n">_00000000111111110010001011011101</span><span class="o">=</span><span class="s1">&#39;24&#39;</span><span class="p">,</span> <span class="n">_00000000111111110010101011010101</span><span class="o">=</span><span class="s1">&#39;31&#39;</span><span class="p">,</span> <span class="n">_00000000111111111010101001010101</span><span class="o">=</span><span class="s1">&#39;32&#39;</span><span class="p">,</span> <span class="n">_00000000111111111001001001101101</span><span class="o">=</span><span class="s1">&#39;33&#39;</span><span class="p">,</span> <span class="n">_00000000111111110001001011101101</span><span class="o">=</span><span class="s1">&#39;34&#39;</span><span class="p">,</span> <span class="n">_00000000111111110000101011110101</span><span class="o">=</span><span class="s1">&#39;41&#39;</span><span class="p">,</span> <span class="n">_00000000111111111000101001110101</span><span class="o">=</span><span class="s1">&#39;42&#39;</span><span class="p">,</span> <span class="n">_00000000111111111011001001001101</span><span class="o">=</span><span class="s1">&#39;43&#39;</span><span class="p">,</span> <span class="n">_00000000111111110011001011001101</span><span class="o">=</span><span class="s1">&#39;44&#39;</span><span class="p">,</span> <span class="n">_00000000111111110011100011000111</span><span class="o">=</span><span class="s1">&#39;51&#39;</span><span class="p">,</span> <span class="n">_00000000111111111011100001000111</span><span class="o">=</span><span class="s1">&#39;52&#39;</span><span class="p">,</span> <span class="n">_00000000111111110111100010000111</span><span class="o">=</span><span class="s1">&#39;53&#39;</span><span class="p">,</span> <span class="n">_00000000111111111111100000000111</span><span class="o">=</span><span class="s1">&#39;54&#39;</span><span class="p">,</span> <span class="n">_00000000111111110001100011100111</span><span class="o">=</span><span class="s1">&#39;61&#39;</span><span class="p">,</span> <span class="n">_00000000111111111001100001100111</span><span class="o">=</span><span class="s1">&#39;62&#39;</span><span class="p">,</span> <span class="n">_00000000111111110101100010100111</span><span class="o">=</span><span class="s1">&#39;63&#39;</span><span class="p">,</span> <span class="n">_00000000111111111101100000100111</span><span class="o">=</span><span class="s1">&#39;64&#39;</span><span class="p">,</span> <span class="n">_00000000111111110010100011010111</span><span class="o">=</span><span class="s1">&#39;71&#39;</span><span class="p">,</span> <span class="n">_00000000111111111010100001010111</span><span class="o">=</span><span class="s1">&#39;72&#39;</span><span class="p">,</span> <span class="n">_00000000111111110110100010010111</span><span class="o">=</span><span class="s1">&#39;73&#39;</span><span class="p">,</span> <span class="n">_00000000111111111110100000010111</span><span class="o">=</span><span class="s1">&#39;74&#39;</span><span class="p">,</span> <span class="n">_00000000111111110000100011110111</span><span class="o">=</span><span class="s1">&#39;81&#39;</span><span class="p">,</span> <span class="n">_00000000111111111000100001110111</span><span class="o">=</span><span class="s1">&#39;82&#39;</span><span class="p">,</span> <span class="n">_00000000111111110100100010110111</span><span class="o">=</span><span class="s1">&#39;83&#39;</span><span class="p">,</span> <span class="n">_00000000111111111100100000110111</span><span class="o">=</span><span class="s1">&#39;84&#39;</span><span class="p">,</span> <span class="n">_00000000111111110011000011001111</span><span class="o">=</span><span class="s1">&#39;91&#39;</span><span class="p">,</span> <span class="n">_00000000111111111011000001001111</span><span class="o">=</span><span class="s1">&#39;92&#39;</span><span class="p">,</span> <span class="n">_00000000111111110111000010001111</span><span class="o">=</span><span class="s1">&#39;93&#39;</span><span class="p">,</span> <span class="n">_00000000111111111111000000001111</span><span class="o">=</span><span class="s1">&#39;94&#39;</span><span class="p">,</span> <span class="n">_00000000111111110001000011101111</span><span class="o">=</span><span class="s1">&#39;101&#39;</span><span class="p">,</span> <span class="n">_00000000111111111001000001101111</span><span class="o">=</span><span class="s1">&#39;102&#39;</span><span class="p">,</span> <span class="n">_00000000111111110101000010101111</span><span class="o">=</span><span class="s1">&#39;103&#39;</span><span class="p">,</span> <span class="n">_00000000111111111101000000101111</span><span class="o">=</span><span class="s1">&#39;104&#39;</span><span class="p">,</span> <span class="n">_00000000111111110010000011011111</span><span class="o">=</span><span class="s1">&#39;111&#39;</span><span class="p">,</span> <span class="n">_00000000111111111010000001011111</span><span class="o">=</span><span class="s1">&#39;112&#39;</span><span class="p">,</span> <span class="n">_00000000111111110110000010011111</span><span class="o">=</span><span class="s1">&#39;113&#39;</span><span class="p">,</span> <span class="n">_00000000111111111110000000011111</span><span class="o">=</span><span class="s1">&#39;114&#39;</span><span class="p">)</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;mainLogger&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;:OK&#39;</span><span class="p">)</span> <span class="c1">#######################################################change name</span>
+<span class="c1">#---------------------------------------------------------------------</span>
+<span class="c1">#relevants</span>
+
+<div class="viewcode-block" id="newObj"><a class="viewcode-back" href="../../objects.html#objects.irRcv.newObj">[docs]</a><span class="k">class</span> <span class="nc">newObj</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">objid</span><span class="p">):</span>
+		<span class="n">obj</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">,</span><span class="n">info</span><span class="p">,</span><span class="n">objid</span><span class="p">)</span>
+		<span class="c1">#zero------------------------------------------------</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">tStatus</span><span class="o">=</span><span class="mi">0</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">=</span><span class="mi">0</span>
+		<span class="c1">#-----------------------------------------------------</span>
+
+<div class="viewcode-block" id="newObj.ndinit"><a class="viewcode-back" href="../../objects.html#objects.irRcv.newObj.ndinit">[docs]</a>	<span class="k">def</span> <span class="nf">ndinit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1">#second part of the init</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">protocols</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;protocols&#39;</span><span class="p">,</span> <span class="n">_14</span><span class="o">=</span><span class="n">protocols</span><span class="o">.</span><span class="n">shutdown</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lights</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">,</span> <span class="n">_24</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l24</span><span class="p">,</span> <span class="n">_34</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l34</span><span class="p">,</span> <span class="n">_44</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l44</span><span class="p">,</span> <span class="n">_54</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l54</span><span class="p">,</span> <span class="n">_61</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l61</span><span class="p">,</span> <span class="n">_62</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l62</span><span class="p">)</span>      
+                <span class="bp">self</span><span class="o">.</span><span class="n">tv</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;tv&#39;</span><span class="p">,</span> <span class="n">_22</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t22</span><span class="p">,</span> <span class="n">_31</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t31</span><span class="p">,</span> <span class="n">_32</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t32</span><span class="p">,</span> <span class="n">_33</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t33</span><span class="p">,</span> <span class="n">_42</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t42</span><span class="p">,</span> <span class="n">_44</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t44</span><span class="p">,</span> <span class="n">_51</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t51</span><span class="p">,</span> <span class="n">_52</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t52</span><span class="p">,</span> <span class="n">_53</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t53</span><span class="p">,</span> <span class="n">_54</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t54</span><span class="p">,</span> <span class="n">_62</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t62</span><span class="p">,</span> <span class="n">_73</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t73</span><span class="p">,</span> <span class="n">_64</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t64</span><span class="p">,</span> <span class="n">_72</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t72</span><span class="p">,</span> <span class="n">_74</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t74</span><span class="p">,</span> <span class="n">_82</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t82</span><span class="p">,</span> <span class="n">_84</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t84</span><span class="p">,</span> <span class="n">_94</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t94</span><span class="p">)</span>
+
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">mapofmaps</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">_101</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lights</span><span class="p">,</span> <span class="n">_111</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tv</span><span class="p">,</span> <span class="n">_114</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">protocols</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lights</span>
+
+<div class="viewcode-block" id="newObj.specInit"><a class="viewcode-back" href="../../objects.html#objects.irRcv.newObj.specInit">[docs]</a>	<span class="k">def</span> <span class="nf">specInit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">objlists</span><span class="p">[</span><span class="mi">5</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fire</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">objlists</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">window1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">objlists</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">light1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">objlists</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+<div class="viewcode-block" id="newObj.compose"><a class="viewcode-back" href="../../objects.html#objects.irRcv.newObj.compose">[docs]</a>	<span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">to</span><span class="o">==</span><span class="s1">&#39;agentS&#39;</span><span class="p">:</span><span class="c1">#setup</span>
+			<span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="s1">&#39;,s,&#39;</span><span class="c1">################################+&#39;#something</span>
+		<span class="k">elif</span> <span class="n">to</span><span class="o">==</span><span class="s1">&#39;agent&#39;</span><span class="p">:</span><span class="c1">#cmd</span>
+			<span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="s1">&#39;,c,&#39;</span><span class="c1">###############################+&#39;#something</span>
+		<span class="k">elif</span> <span class="n">to</span><span class="o">==</span><span class="s1">&#39;client&#39;</span><span class="p">:</span>
+			<span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clientAddr</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">auto</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;,&#39;</span><span class="c1">######################+&#39;#something</span></div>
+		<span class="k">return</span> <span class="n">msg</span>
+
+<div class="viewcode-block" id="newObj.aProcessor"><a class="viewcode-back" href="../../objects.html#objects.irRcv.newObj.aProcessor">[docs]</a>	<span class="k">def</span> <span class="nf">aProcessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming</span><span class="p">):</span> <span class="c1">#String incoming: bin code</span>
+		<span class="k">try</span><span class="p">:</span> <span class="c1">#########################combine the signal comparison of the two dicts</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">btnMap</span><span class="p">[</span><span class="n">incoming</span><span class="p">]]()</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">btnMap</span><span class="p">[</span><span class="n">incoming</span><span class="p">])</span>
+		<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+			<span class="k">try</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mapofmaps</span><span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">btnMap</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">io</span><span class="p">]]</span>
+				<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;rc mode: &#39;</span><span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+			<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<span class="c1">#                               print (&#39;key not found&#39;) #################log as warning?</span>
+				<span class="k">pass</span></div></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">informAll</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Aitch.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
