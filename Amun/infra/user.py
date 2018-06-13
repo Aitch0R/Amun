@@ -1,4 +1,4 @@
-#import
+# import
 import importlib
 import logging
 import threading
@@ -9,249 +9,261 @@ import infra.config as config
 from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 
-wcom=importlib.import_module(config.wcom)
-gvar=importlib.import_module(config.gvar)
-protocols=importlib.import_module(config.protocols)
+wcom = importlib.import_module(config.wcom)
+gvar = importlib.import_module(config.gvar)
+protocols = importlib.import_module(config.protocols)
 logger = logging.getLogger('mainLogger')
-#---------------------------------------------------------------------
-class user(object): 
-	def __init__(self,path):
-		#user
-		self.filePath=path	#user file as spcified in the structure file
-		self.myfile=importlib.import_module(self.filePath)
-		self.configs=self.myfile.configs	#read the configs dict
-		self.name=self.configs['name']
-		self.logId='user-'+self.name+': '
-		self.admin=self.configs['admin']
-		self.ruleFileName=self.name+'Rules'
-		self.events=events(self) #create events list
-		#
-		#rooms setup
-		self.roomlist=gvar.rooms
-		self.roomsid=self.configs['rooms']
-		self.rooms={}
-		for roomid in self.roomsid:
-			self.rooms[str(roomid)]=self.roomlist[roomid]
-			self.roomlist[roomid].adduser(self) #add user to the room object
-		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
-		for room in self.roomsid:
-			self.clientcreate=self.clientcreate+self.rooms[str(room)].roomstring
-		#"s,,,1,My room,1,,l,1,main light,,l,2,small light,,a,2,small light";
-		#logger.info(self.logId+self.clientcreate)
-		#
-		self.rulesupdate()
-		self.serverL=wcom.server(self,dict(port=self.configs['port']))
-		self.serverR=wcom.server(self,dict(port=self.configs['port']),config.remoteIp)
-		self.init=types.MethodType(importlib.import_module(self.filePath).init, self)
-		self.init()
-		logger.info(self.logId+'ready')
-		print(self.clientcreate)
-
-	def rulesupdate(self):#read,compile and excute rules from user file
-		self.rule=types.MethodType(importlib.import_module(self.filePath).rule, self)		
-
-	def process(self,caller,_input):
-		print(_input)
-		try:
-			self.len=len(_input)
-			if _input[0]=='i':
-				self.execute(_input[1:])
-			elif _input[0]=='setup':#setup
-				self.server.send(self.clientcreate)
-			elif _input[0]=='update':
-				self.statusUpdate()
-			elif _input[0]=='sc':
-				if self.len<5:
-					raise IndexError
-				logger.debug(self._input)
-				self.event.new(self,_input[1:])
-			else:
-				logger.error('unknown command type')
-		except IndexError:
-			logger.error('unknown command format')
-			
-	def execute(self, _input):
-		print(_input[1])
-		if _input[0]=='p':
-			print(_input[1])
-			if _input[1] == 'seth':
-				protocols.shutdown(False)
-			elif _input[1]=='awake':
-				protocols.awake([0])
-			elif _input[1]=='asleep':
-				protocols.asleep([0])
-			elif _input[1]=='out':
-				protocols.suspend()
-			else:
-				logger.error('unknown protocol')
-		elif _input[0]=='c':#command
-			try:
-				print (_input)
-				self.rooms[int(_input[1])].objlists[int(_input[2])][int(_input[3])].process(_input[4:])
-			except (IndexError,ValueError):
-				logger.error('wrong address')
 
 
-	def inform(self,msg): #inform both user and ruleswatcher
-		self.rule(msg)
-		self.nmsg='i,,,'+msg #new message
-		print(msg)
-		self.serverL.send(self.nmsg)
-		self.serverR.send(self.nmsg)
+# ---------------------------------------------------------------------
+class user(object):
+    def __init__(self, path):
+        # user
+        self.filePath = path  # user file as spcified in the structure file
+        self.myfile = importlib.import_module(self.filePath)
+        self.configs = self.myfile.configs  # read the configs dict
+        self.name = self.configs['name']
+        self.logId = 'user-' + self.name + ': '
+        self.admin = self.configs['admin']
+        self.ruleFileName = self.name + 'Rules'
+        self.events = events(self)  # create events list
+        #
+        # rooms setup
+        self.roomlist = gvar.rooms
+        self.roomsid = self.configs['rooms']
+        self.rooms = {}
+        for roomid in self.roomsid:
+            self.rooms[str(roomid)] = self.roomlist[roomid]
+            self.roomlist[roomid].adduser(self)  # add user to the room object
+        self.clientcreate = 's,,,' + str(self.name) + ',' + str(self.admin)
+        for room in self.roomsid:
+            self.clientcreate = self.clientcreate + self.rooms[str(room)].roomstring
+#           "s,,,1,My room,1,,l,1,main light,,l,2,small light,,a,2,small light";
+#           logger.info(self.logId+self.clientcreate)
+#
+        self.rulesupdate()
+        self.serverL = wcom.server(self, dict(port=self.configs['port']))
+        self.serverR = wcom.server(self, dict(port=self.configs['port']), config.remoteIp)
+        self.init = types.MethodType(importlib.import_module(self.filePath).init, self)
+        self.init()
+        logger.info(self.logId + 'ready')
+        print(self.clientcreate)
 
-	def statusUpdate(self):
-		for room in self.roomsid:
-			self.rooms[str(room)].inform(self)
+    def rulesupdate(self):  # read,compile and excute rules from user file
+        self.rule = types.MethodType(importlib.import_module(self.filePath).rule, self)
 
-	def shutdown(self):
-		pass
-#--------------------------------------------------------------------------------------------------
+    def process(self, caller, _input):
+        print(_input)
+        try:
+            self.len = len(_input)
+            if _input[0] == 'i':
+                self.execute(_input[1:])
+            elif _input[0] == 'setup':  # setup
+                self.server.send(self.clientcreate)
+            elif _input[0] == 'update':
+                self.statusUpdate()
+            elif _input[0] == 'sc':
+                if self.len < 5:
+                    raise IndexError
+                logger.debug(self._input)
+                self.event.new(self, _input[1:])
+            else:
+                logger.error('unknown command type')
+        except IndexError:
+            logger.error('unknown command format')
+
+    def execute(self, _input):
+        print(_input[1])
+        if _input[0] == 'p':
+            print(_input[1])
+            if _input[1] == 'seth':
+                protocols.shutdown(False)
+            elif _input[1] == 'awake':
+                protocols.awake([0])
+            elif _input[1] == 'asleep':
+                protocols.asleep([0])
+            elif _input[1] == 'out':
+                protocols.suspend()
+            else:
+                logger.error('unknown protocol')
+        elif _input[0] == 'c':  # command
+            try:
+                print(_input)
+                self.rooms[int(_input[1])].objlists[int(_input[2])][int(_input[3])].process(_input[4:])
+            except (IndexError, ValueError):
+                logger.error('wrong address')
+
+    def inform(self, msg):  # inform both user and ruleswatcher
+        self.rule(msg)
+        self.nmsg = 'i,,,' + msg  # new message
+        print(msg)
+        self.serverL.send(self.nmsg)
+        self.serverR.send(self.nmsg)
+
+    def statusUpdate(self):
+        for room in self.roomsid:
+            self.rooms[str(room)].inform(self)
+
+    def shutdown(self):
+        pass
+
+
+# --------------------------------------------------------------------------------------------------
 class root(user):
-	def __init__(self):
-		self.name='root'
-		self.filePath=config.root
-		self.myfile=importlib.import_module(self.filePath)
-		self.ruleFileName=self.name+'Rules'
-		self.admin=True
-		self.scheduler=scheduleMngr
-		self.scheduler.addUser(self)
-		self.serverL=wcom.server(self,dict(port=1000))
-		self.serverR=wcom.server(self,dict(port=1000),config.remoteIp)
-		self.rules=importlib.import_module(config.rootRules)
-		self.rooms=gvar.rooms
-		self.logId=self.name+':'
-		self.clientcreate='s,,,'+str(self.name)+','+str(self.admin)
-		self.rulesupdate()
-		
-	def manProcess(self,_input):
-		self.input=_input
-		print('man will do')
-		compiled=compile(self.input,self.ruleFileName,'exec')
-		#exec(compiled)	#suspended till proper try-except
+    def __init__(self):
+        self.name = 'root'
+        self.filePath = config.root
+        self.myfile = importlib.import_module(self.filePath)
+        self.ruleFileName = self.name + 'Rules'
+        self.admin = True
+        self.scheduler = scheduleMngr
+        self.scheduler.addUser(self)
+        self.serverL = wcom.server(self, dict(port=1000))
+        self.serverR = wcom.server(self, dict(port=1000), config.remoteIp)
+        self.rules = importlib.import_module(config.rootRules)
+        self.rooms = gvar.rooms
+        self.logId = self.name + ':'
+        self.clientcreate = 's,,,' + str(self.name) + ',' + str(self.admin)
+        self.rulesupdate()
 
-	def raOk(self):
-		importlib.import_module(self.filePath).init(self,protocols)
-		for room in self.rooms:
-			room.adduser(self)
-			self.clientcreate=self.clientcreate+room.roomstring
-		
-	def connected(self,state):
-		if state:
-			self.serverL.send(self.clientcreate)
-			self.serverR.send(self.clientcreate)
-		
-	def statusUpdate(self):
-		for room in self.rooms:
-			room.statusUpdate(self)
-		
-	def output(self,output): #what the ...?
-		print('test ', output)
+    def manProcess(self, _input):
+        self.input = _input
+        print('man will do')
+        compiled = compile(self.input, self.ruleFileName, 'exec')
 
-	def shutdown(self): #exit flag
-		self.runstat=0
-#----------------------------------------------------------------------------------------------------
+    # exec(compiled)	#suspended till proper try-except
+
+    def raOk(self):
+        importlib.import_module(self.filePath).init(self, protocols)
+        for room in self.rooms:
+            room.adduser(self)
+            self.clientcreate = self.clientcreate + room.roomstring
+
+    def connected(self, state):
+        if state:
+            self.serverL.send(self.clientcreate)
+            self.serverR.send(self.clientcreate)
+
+    def statusUpdate(self):
+        for room in self.rooms:
+            room.statusUpdate(self)
+
+    def output(self, output):  # what the ...?
+        print('test ', output)
+
+    def shutdown(self):  # exit flag
+        self.runstat = 0
+
+
+# ----------------------------------------------------------------------------------------------------
 class scheduler(object):
-	def __init__(self):
-		self.scheduler = BackgroundScheduler(timezone="Europe/London")
-		#configure here
-		#self.scheduler.configure(timezone="Europe/Berlin")
-		self.users=[]
-		self.scheduler.start()
-#		scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
+    def __init__(self):
+        self.scheduler = BackgroundScheduler(timezone="Europe/London")
+        # configure here
+        # self.scheduler.configure(timezone="Europe/Berlin")
+        self.users = []
+        self.scheduler.start()
 
-	def addTE(self, userId, _time, cmd, rep=0, delay=3600):
-		self.runDate=time.strftime("%Y-%m-%b", time.localtime())+' '+_time+':00'
-		if rep=='0':
-			scheduler.add_job(self.users[userId].process, trigger='date', run_date=self.runDate, args=[cmd])
-		else:
-			if rep==1: #day
-				self.delay=24*60*60
-			elif rep==2: #hour
-				self.delay=60*60
-			elif rep==3: #custom
-				self.delay=delay*60 #delay in minutes
-			scheduler.add_job(self.users[userId].process, trigger='interval', run_date=self.runDate, minutes=delay , args=[cmd])
+#       scheduler.add_job(print, trigger='date', run_date='2017-09-29 13:52:05', args=['stuff'])
 
-	def addUser(self, user):
-		self.users.append(user)
+    def addTE(self, userId, _time, cmd, rep=0, delay=3600):
+        self.runDate = time.strftime("%Y-%m-%b", time.localtime()) + ' ' + _time + ':00'
+        if rep == '0':
+            scheduler.add_job(self.users[userId].process, trigger='date', run_date=self.runDate, args=[cmd])
+        else:
+            if rep == 1:  # day
+                self.delay = 24 * 60 * 60
+            elif rep == 2:  # hour
+                self.delay = 60 * 60
+            elif rep == 3:  # custom
+                self.delay = delay * 60  # delay in minutes
+            scheduler.add_job(self.users[userId].process, trigger='interval', run_date=self.runDate, minutes=delay,
+                              args=[cmd])
 
-class events(object): 
-	def __init__(self,parent):
-		self.parent=parent
-		self.schedule=sched.scheduler(time.time, time.sleep)
-		self.events=[None]*100
-		self.schedule.enterabs(time.time()+1000,1, print, 'end')
-#		threading.Thread(target=self.schedule.run).start()
-		self.scheduler = BackgroundScheduler()
+    def addUser(self, user):
+        self.users.append(user)
 
-	def newFE(self, function, _time, args=None, rep=0, delay=60): #default no args, no rep, dealy 1 hour if custom
-		try:
-			self.timeInSec=time.mktime(time.strptime(time.strftime("%d %b %Y", time.localtime())+' '+_time, '%d %b %Y %H:%M')) #time as string in HH:mm format
-			print(self.timeInSec,' ',time.time())
-			if self.timeInSec <= time.time():
-				raise ValueError
-			self.schedule.enterabs(self.timeInSec,1, function, args)
-			if rep==1: #day
-				self.delay=24*60*60
-			elif rep==2: #hour
-				self.delay=60*60
-			elif rep==3: #custom
-				self.delay=delay*60 #delay in minutes
-			self.timeInSec=self.timeInSec+24*60*60
-			if not rep==0:
-				self.newFE(function, _time+self.delay, args, rep, delay)
-		except ValueError:
-			print('er')
 
-	def newTE(self, cmd, _time, args=None, rep=0, delay=60):
-		self._input=_input
-		self.typ=_input[0]
-		self._time=_input[1]
-		self.index=chkfree()
-		print(self.index)		
-		try:
-			if self.typ=='1':
-				self.tofloat=time.mktime(time.strptime(self._input[1],"%y:%m:%d:%H:%M:%S"))
-				self.after=self.tofloat-time.mktime(time.localtime())
-			elif self.typ=='2':
-				self.after=int(self._time)
-		except ValueError:				
-			logger.error('wrong time format')
-		try:
-			if self.after<=0:
-				raise ValueError
-			self.ev=threading.Timer(self.after,self.execute)
-			self.ev.start()
-			self.events[self.index]=self.ev
-		except ValueError:
-			logger.error('wrong schedule value')
-		except AttributeError:
-			logger.error('wrong schedule type')
+class events(object):
+    def __init__(self, parent):
+        self.parent = parent
+        self.schedule = sched.scheduler(time.time, time.sleep)
+        self.events = [None] * 100
+        self.schedule.enterabs(time.time() + 1000, 1, print, 'end')
+#       threading.Thread(target=self.schedule.run).start()
+        self.scheduler = BackgroundScheduler()
 
-	def index(self):
-		return self.index
-	
-	def execute(self):
-		self.parent.director.direct(self._input[2:])
-		self.event[self.index]=None
-		print(self.index)
+    def newFE(self, function, _time, args=None, rep=0, delay=60):  # default no args, no rep, dealy 1 hour if custom
+        try:
+            self.timeInSec = time.mktime(time.strptime(time.strftime("%d %b %Y", time.localtime()) + ' ' + _time,
+                                                       '%d %b %Y %H:%M'))  # time as string in HH:mm format
+            print(self.timeInSec, ' ', time.time())
+            if self.timeInSec <= time.time():
+                raise ValueError
+            self.schedule.enterabs(self.timeInSec, 1, function, args)
+            if rep == 1:  # day
+                self.delay = 24 * 60 * 60
+            elif rep == 2:  # hour
+                self.delay = 60 * 60
+            elif rep == 3:  # custom
+                self.delay = delay * 60  # delay in minutes
+            self.timeInSec = self.timeInSec + 24 * 60 * 60
+            if not rep == 0:
+                self.newFE(function, _time + self.delay, args, rep, delay)
+        except ValueError:
+            print('er')
 
-	def chkfree(self):
-		for i in range(100):
-			if self.event[i] == None:
-				break
-				return i
+    def newTE(self, cmd, _time, args=None, rep=0, delay=60):
+        self._input = _input
+        self.typ = _input[0]
+        self._time = _input[1]
+        self.index = chkfree()
+        print(self.index)
+        try:
+            if self.typ == '1':
+                self.tofloat = time.mktime(time.strptime(self._input[1], "%y:%m:%d:%H:%M:%S"))
+                self.after = self.tofloat - time.mktime(time.localtime())
+            elif self.typ == '2':
+                self.after = int(self._time)
+        except ValueError:
+            logger.error('wrong time format')
+        try:
+            if self.after <= 0:
+                raise ValueError
+            self.ev = threading.Timer(self.after, self.execute)
+            self.ev.start()
+            self.events[self.index] = self.ev
+        except ValueError:
+            logger.error('wrong schedule value')
+        except AttributeError:
+            logger.error('wrong schedule type')
 
-	def timetill(self):
-		pass
+    def index(self):
+        return self.index
 
-	def when(self):
-		pass
+    def execute(self):
+        self.parent.director.direct(self._input[2:])
+        self.event[self.index] = None
+        print(self.index)
 
-	def _delay(self):
-		pass
+    def chkfree(self):
+        for i in range(100):
+            if self.event[i] == None:
+                break
+            return i
 
-	def cancel(self):
-		pass
-#-----------------------------------------------------------------
+    def timetill(self):
+        pass
+
+    def when(self):
+        pass
+
+    def _delay(self):
+        pass
+
+    def cancel(self):
+        pass
+
+
+# -----------------------------------------------------------------
 logger.info('user:OK')
